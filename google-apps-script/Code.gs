@@ -134,7 +134,7 @@ function jsonResponse_(obj) {
 function adminLogin(password) {
   const stored = PropertiesService.getScriptProperties().getProperty('ADMIN_PASSWORD');
   if (!stored) {
-    return { success: false, message: 'ADMIN_PASSWORD belum diset. Jalankan setAdminPassword("bos210514") di editor.' };
+    return { success: false, message: 'ADMIN_PASSWORD belum diset. Jalankan setAdminPassword("password_anda") di editor.' };
   }
   if (password === stored) {
     const token = Utilities.getUuid();
@@ -521,10 +521,17 @@ function setupSheets() {
   sh.appendRow(['Timestamp', 'Booking ID', 'Action', 'Detail']);
   sh.setFrozenRows(1);
 
-SpreadsheetApp.flush();
+  SpreadsheetApp.flush();
   Logger.log('Setup selesai.');
 }
 
+/** Fungsi bantu sementara untuk set password admin. Jalankan sekali lewat dropdown toolbar. */
 function jalankanSekali() {
   setAdminPassword("bos210514");
+}
+
+function cekPassword() {
+  setAdminPassword("bos210514");
+  var hasil = PropertiesService.getScriptProperties().getProperty('ADMIN_PASSWORD');
+  Logger.log('PASSWORD YANG TERSIMPAN: ' + hasil);
 }
