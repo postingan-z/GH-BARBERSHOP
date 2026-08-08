@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Booking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="login-wrap">
+  <div class="card login-card">
+    <h2>Admin Login</h2>
+    <p class="subtitle">Masukkan password admin untuk mengakses dashboard.</p>
+    <form id="login-form">
+      <div class="field">
+        <label>Password</label>
+        <input type="password" name="password" required placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn btn-primary" id="login-btn">Masuk</button>
+    </form>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="page-wide" id="dashboard-wrap" style="display:none;">
+  <div class="topbar">
+    <div class="brand">Admin Dashboard<span>.</span></div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div id="conn-indicator" class="conn-indicator online">● LIVE</div>
+      <button class="btn btn-outline btn-sm" id="logout-btn">Keluar</button>
+    </div>
+  </div>
+
+  <div class="stat-grid" id="stat-grid">
+    <div class="stat-card"><div class="num" id="s-total">0</div><div class="lbl">Total</div></div>
+    <div class="stat-card"><div class="num" id="s-PENDING">0</div><div class="lbl">Pending</div></div>
+    <div class="stat-card"><div class="num" id="s-CONFIRMED">0</div><div class="lbl">Confirmed</div></div>
+    <div class="stat-card"><div class="num" id="s-RESCHEDULED">0</div><div class="lbl">Rescheduled</div></div>
+    <div class="stat-card"><div class="num" id="s-CANCELLED">0</div><div class="lbl">Cancelled</div></div>
+    <div class="stat-card"><div class="num" id="s-REJECTED">0</div><div class="lbl">Rejected</div></div>
+    <div class="stat-card"><div class="num" id="s-COMPLETED">0</div><div class="lbl">Completed</div></div>
+  </div>
+
+  <div class="card" style="padding:0; overflow:hidden;">
+    <div style="padding:18px 18px 4px;"><h2>Semua Booking</h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Booking ID</th><th>Nama</th><th>WhatsApp</th><th>Tanggal</th><th>Jam</th>
+            <th>Jumlah</th><th>Layanan</th><th>Status</th><th>Diperbarui</th><th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="booking-tbody">
+          <tr><td colspan="10" class="loading-row">Memuat data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: RESCHEDULE -->
+<div class="modal-backdrop" id="reschedule-modal">
+  <div class="modal-card">
+    <h2>Reschedule Booking</h2>
+    <p class="subtitle">Booking ID: <b id="rs-booking-id">-</b></p>
+    <div class="field">
+      <label>Tanggal Baru</label>
+      <input type="date" id="rs-tanggal">
+    </div>
+    <div class="field">
+      <label>Jam Baru</label>
+      <input type="time" id="rs-jam">
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" id="rs-cancel-btn" type="button">Batal</button>
+      <button class="btn btn-primary" id="rs-submit-btn" type="button">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ALASAN (cancel/reject) -->
+<div class="modal-backdrop" id="reason-modal">
+  <div class="modal-card">
+    <h2 id="reason-title">Alasan</h2>
+    <p class="subtitle">Booking ID: <b id="rn-booking-id">-</b></p>
+    <div class="field">
+      <label>Alasan</label>
+      <textarea id="rn-alasan" placeholder="Tulis alasan..."></textarea>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" id="rn-cancel-btn" type="button">Batal</button>
+      <button class="btn btn-red" id="rn-submit-btn" type="button">Konfirmasi</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/admin.js"></script>
+</body>
+</html>

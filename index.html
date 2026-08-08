@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking Online</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="page">
+  <div class="topbar">
+    <div class="brand">Booking<span>.</span></div>
+    <div id="conn-indicator" class="conn-indicator online">● LIVE</div>
+  </div>
+
+  <!-- FORM BOOKING -->
+  <div class="card" id="form-card">
+    <h2>Buat Booking</h2>
+    <p class="subtitle">Isi data di bawah, sistem akan mengecek ketersediaan slot secara real-time.</p>
+
+    <form id="booking-form">
+      <div class="field">
+        <label>Nama Lengkap</label>
+        <input type="text" name="nama" required placeholder="Nama Anda">
+      </div>
+      <div class="field">
+        <label>Nomor WhatsApp</label>
+        <input type="tel" name="whatsapp" required placeholder="08123456789">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Tanggal</label>
+          <input type="date" name="tanggal" id="input-tanggal" required>
+        </div>
+        <div class="field">
+          <label>Jumlah Orang</label>
+          <input type="number" name="jumlah" min="1" value="1" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>Jenis Layanan</label>
+        <select name="layanan" id="select-layanan" required>
+          <option value="">Memuat layanan...</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Pilih Jam</label>
+        <div id="slot-grid" class="slot-grid">
+          <div class="loading-row">Pilih tanggal untuk melihat jam tersedia</div>
+        </div>
+        <input type="hidden" name="jam" id="input-jam" required>
+      </div>
+
+      <div class="field">
+        <label>Catatan (opsional)</label>
+        <textarea name="catatan" placeholder="Tulis catatan tambahan..."></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="submit-btn">Buat Booking</button>
+    </form>
+  </div>
+
+  <!-- HASIL BOOKING -->
+  <div class="card" id="result-card" style="display:none;">
+    <h2>Booking Berhasil Dibuat</h2>
+    <div class="detail-row"><span class="label">Booking ID</span><span class="value" id="res-id">-</span></div>
+    <div class="detail-row"><span class="label">Nama</span><span class="value" id="res-nama">-</span></div>
+    <div class="detail-row"><span class="label">Tanggal</span><span class="value" id="res-tanggal">-</span></div>
+    <div class="detail-row"><span class="label">Jam</span><span class="value" id="res-jam">-</span></div>
+    <div class="detail-row"><span class="label">Status</span><span class="value"><span class="badge badge-PENDING">PENDING</span></span></div>
+
+    <div style="margin-top:18px; display:flex; flex-direction:column; gap:10px;">
+      <a class="btn btn-amber" id="res-wa-btn" target="_blank" rel="noopener">Kirim WhatsApp</a>
+      <a class="btn btn-outline" href="status.html" id="res-status-link">Cek Status Booking</a>
+      <button class="btn btn-outline" id="res-new-btn" type="button">Buat Booking Lain</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/booking.js"></script>
+</body>
+</html>
