@@ -134,7 +134,7 @@ function jsonResponse_(obj) {
 function adminLogin(password) {
   const stored = PropertiesService.getScriptProperties().getProperty('ADMIN_PASSWORD');
   if (!stored) {
-    return { success: false, message: 'ADMIN_PASSWORD belum diset. Jalankan setAdminPassword("password_anda") di editor.' };
+    return { success: false, message: 'ADMIN_PASSWORD belum diset. Jalankan setAdminPassword("bos210514") di editor.' };
   }
   if (password === stored) {
     const token = Utilities.getUuid();
@@ -506,8 +506,7 @@ function setupSheets() {
   sh = ss.getSheetByName(SHEET_SERVICES) || ss.insertSheet(SHEET_SERVICES);
   sh.clear();
   sh.appendRow(['Nama Layanan', 'Durasi (menit)', 'Harga']);
-  sh.appendRow(['Layanan A', 60, 100000]);
-  sh.appendRow(['Layanan B', 30, 50000]);
+  sh.appendRow(['Layanan A', 'Sampai Selesai', 100000]);
   sh.setFrozenRows(1);
 
   // ADMIN (opsional, catatan saja - password sesungguhnya di Script Properties)
@@ -522,6 +521,10 @@ function setupSheets() {
   sh.appendRow(['Timestamp', 'Booking ID', 'Action', 'Detail']);
   sh.setFrozenRows(1);
 
-  SpreadsheetApp.flush();
-  Logger.log('Setup selesai. Jangan lupa jalankan setAdminPassword("password_anda").');
+SpreadsheetApp.flush();
+  Logger.log('Setup selesai.');
+}
+
+function jalankanSekali() {
+  setAdminPassword("bos210514");
 }
