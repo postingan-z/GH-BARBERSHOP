@@ -1,62 +1,279 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cek Status Booking</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
+/**
+ * STATUS.JS - logika halaman status.html (cek status real-time)
+ * Terintegrasi dengan API dan Local Storage fallback
+ */
+(function() {
+    'use strict';
 
-<div class="page">
-  <div class="topbar">
-    <div class="brand"><a href="index.html" style="text-decoration:none;color:inherit;">Booking<span>.</span></a></div>
-    <div id="conn-indicator" class="conn-indicator online">● LIVE</div>
-  </div>
+    // ========== DOM REFS ==========
+    const searchForm = document.getElementById('search-form');
+    const searchBtn = document.getElementById('search-btn');
+    const searchCard = document.getElementById('search-card');
+    const detailCard = document.getElementById('detail-card');
+    const backBtn = document.getElementById('d-back-btn');
+    const waBtn = document.getElementById('d-wa-btn');
 
-  <div class="card" id="search-card">
-    <h2>Cek Status Booking</h2>
-    <p class="subtitle">Masukkan Booking ID dan Nomor WhatsApp yang Anda gunakan saat booking.</p>
-    <form id="search-form">
-      <div class="field">
-        <label>Booking ID</label>
-        <input type="text" name="bookingId" required placeholder="BK-20260809-0001">
-      </div>
-      <div class="field">
-        <label>Nomor WhatsApp</label>
-        <input type="tel" name="whatsapp" required placeholder="08123456789">
-      </div>
-      <button type="submit" class="btn btn-primary" id="search-btn">Cek Status</button>
-    </form>
-  </div>
+    // Detail elements
+    const dId = document.getElementById('d-id');
+    const dNama = document.getElementById('d-nama');
+    const dTanggal = document.getElementById('d-tanggal');
+    const dJam = document.getElementById('d-jam');
+    const dJumlah = document.getElementById('d-jumlah');
+    const dLayanan = document.getElementById('d-layanan');
+    const dCatatan = document.getElementById('d-catatan');
+    const dUpdated = document.getElementById('d-updated');
+    const dBadge = document.getElementById('detail-badge');
 
-  <div class="card" id="detail-card" style="display:none;">
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-      <h2 style="margin:0;">Detail Booking</h2>
-      <span id="detail-badge" class="badge badge-PENDING">PENDING</span>
-    </div>
-    <div class="detail-row"><span class="label">Booking ID</span><span class="value" id="d-id">-</span></div>
-    <div class="detail-row"><span class="label">Nama</span><span class="value" id="d-nama">-</span></div>
-    <div class="detail-row"><span class="label">Tanggal</span><span class="value" id="d-tanggal">-</span></div>
-    <div class="detail-row"><span class="label">Jam</span><span class="value" id="d-jam">-</span></div>
-    <div class="detail-row"><span class="label">Jumlah</span><span class="value" id="d-jumlah">-</span></div>
-    <div class="detail-row"><span class="label">Layanan</span><span class="value" id="d-layanan">-</span></div>
-    <div class="detail-row"><span class="label">Catatan</span><span class="value" id="d-catatan">-</span></div>
-    <div class="detail-row"><span class="label">Terakhir Diperbarui</span><span class="value" id="d-updated">-</span></div>
+    // ========== STATE ==========
+    let currentBookingId = null;
+    let currentWhatsapp = null;
+    let pollHandle = null;
+    let lastStatus = null;
 
-    <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
-      <a class="btn btn-amber" id="d-wa-btn" target="_blank" rel="noopener">Kirim WhatsApp</a>
-      <button class="btn btn-outline" id="d-back-btn" type="button">Cek Booking Lain</button>
-    </div>
-  </div>
-</div>
+    // ========== SEARCH BOOKING ==========
+    searchForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-<div id="toast-container"></div>
+        const fd = new FormData(searchForm);
+        const bookingId = fd.get('bookingId').trim();
+        const whatsapp = fd.get('whatsapp').trim();
 
-<script src="assets/js/config.js"></script>
-<script src="assets/js/api.js"></script>
-<script src="assets/js/status.js"></script>
-</body>
-</html>
+        // Validasi input
+        if (!bookingId) {
+            toast('Silakan masukkan Booking ID', 'error');
+            return;
+        }
+
+        if (!whatsapp) {
+            toast('Silakan masukkan nomor WhatsApp', 'error');
+            return;
+        }
+
+        // Validate WhatsApp number
+        if (!/^[0-9]{10,15}$/.test(whatsapp)) {
+            toast('Nomor WhatsApp tidak valid (min 10 digit angka)', 'error');
+            return;
+        }
+
+        // Disable button
+        searchBtn.disabled = true;
+        searchBtn.textContent = 'Mencari...';
+
+        try {
+            // Cari booking via API
+            const res = await API.getBookingById(bookingId, whatsapp);
+
+            if (!res.success) {
+                toast(res.message || 'Booking tidak ditemukan.', 'error');
+                searchBtn.disabled = false;
+                searchBtn.textContent = 'Cek Status';
+                return;
+            }
+
+            // Simpan data
+            currentBookingId = bookingId;
+            currentWhatsapp = whatsapp;
+            lastStatus = res.booking.status;
+
+            // Tampilkan detail
+            showDetail(res.booking);
+            searchCard.style.display = 'none';
+            detailCard.style.display = 'block';
+
+            // Start polling for real-time updates
+            if (pollHandle) clearInterval(pollHandle);
+            pollHandle = startPolling(pollStatus, CONFIG.POLLING_INTERVAL_MS || 4000);
+
+            toast('Booking ditemukan!', 'success');
+
+        } catch (error) {
+            console.error('Error searching booking:', error);
+            toast('Terjadi kesalahan, silakan coba lagi', 'error');
+        } finally {
+            searchBtn.disabled = false;
+            searchBtn.textContent = 'Cek Status';
+        }
+    });
+
+    // ========== POLL STATUS ==========
+    async function pollStatus() {
+        if (!currentBookingId || !currentWhatsapp) {
+            console.warn('Polling stopped: no booking data');
+            if (pollHandle) {
+                clearInterval(pollHandle);
+                pollHandle = null;
+            }
+            return;
+        }
+
+        try {
+            const res = await API.getBookingById(currentBookingId, currentWhatsapp);
+            
+            if (!res.success) {
+                // Booking mungkin sudah dihapus
+                if (pollHandle) {
+                    clearInterval(pollHandle);
+                    pollHandle = null;
+                }
+                toast('Booking tidak ditemukan lagi', 'error');
+                return;
+            }
+
+            // Cek apakah status berubah
+            if (res.booking.status !== lastStatus) {
+                const statusMap = {
+                    'PENDING': '⏳ PENDING',
+                    'CONFIRMED': '✅ CONFIRMED',
+                    'RESCHEDULED': '🔄 RESCHEDULED',
+                    'COMPLETED': '✔️ COMPLETED',
+                    'CANCELLED': '❌ CANCELLED',
+                    'REJECTED': '⛔ REJECTED'
+                };
+                const newStatus = statusMap[res.booking.status] || res.booking.status;
+                toast(`Status booking diperbarui: ${newStatus}`, 'success');
+                lastStatus = res.booking.status;
+                showDetail(res.booking);
+            }
+        } catch (error) {
+            console.error('Polling error:', error);
+            // Jangan hentikan polling, biarkan tetap berjalan
+        }
+    }
+
+    // ========== SHOW DETAIL ==========
+    function showDetail(booking) {
+        // Set data
+        dId.textContent = booking.bookingId;
+        dNama.textContent = booking.nama;
+        dTanggal.textContent = booking.tanggal;
+        dJam.textContent = booking.jam;
+        dJumlah.textContent = booking.jumlah;
+        dLayanan.textContent = booking.layanan;
+        dCatatan.textContent = booking.catatan || '-';
+        dUpdated.textContent = booking.updatedAt ? formatDate(booking.updatedAt) : '-';
+
+        // Update badge
+        const statusMap = {
+            'PENDING': { label: '⏳ PENDING', class: 'badge-PENDING' },
+            'CONFIRMED': { label: '✅ CONFIRMED', class: 'badge-CONFIRMED' },
+            'RESCHEDULED': { label: '🔄 RESCHEDULED', class: 'badge-RESCHEDULED' },
+            'COMPLETED': { label: '✔️ COMPLETED', class: 'badge-COMPLETED' },
+            'CANCELLED': { label: '❌ CANCELLED', class: 'badge-CANCELLED' },
+            'REJECTED': { label: '⛔ REJECTED', class: 'badge-REJECTED' }
+        };
+
+        const statusInfo = statusMap[booking.status] || { label: booking.status, class: 'badge-PENDING' };
+        dBadge.textContent = statusInfo.label;
+        dBadge.className = 'badge ' + statusInfo.class;
+
+        // Update WhatsApp button
+        const template = WA_TEMPLATES[booking.status] || WA_TEMPLATES['new'];
+        const message = template(booking);
+        const waNumber = CONFIG.WHATSAPP_ADMIN_NUMBER || '6281234567890';
+        waBtn.href = waLink(waNumber, message);
+    }
+
+    // ========== FORMAT DATE ==========
+    function formatDate(dateStr) {
+        if (!dateStr) return '-';
+        try {
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('id-ID') + ' ' + 
+                   d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        } catch {
+            return dateStr;
+        }
+    }
+
+    // ========== BACK BUTTON ==========
+    backBtn.addEventListener('click', function() {
+        // Stop polling
+        if (pollHandle) {
+            clearInterval(pollHandle);
+            pollHandle = null;
+        }
+        
+        // Reset state
+        currentBookingId = null;
+        currentWhatsapp = null;
+        lastStatus = null;
+
+        // Show search, hide detail
+        detailCard.style.display = 'none';
+        searchCard.style.display = 'block';
+        searchForm.reset();
+        
+        // Focus on first input
+        const firstInput = searchForm.querySelector('input');
+        if (firstInput) firstInput.focus();
+    });
+
+    // ========== WHATSAPP BUTTON ==========
+    waBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (this.href) {
+            window.open(this.href, '_blank');
+        }
+    });
+
+    // ========== KEYBOARD SHORTCUT ==========
+    document.addEventListener('keydown', function(e) {
+        // ESC to go back
+        if (e.key === 'Escape' && detailCard.style.display !== 'none') {
+            backBtn.click();
+        }
+    });
+
+    // ========== AUTO CHECK URL PARAMS ==========
+    function checkUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        const bookingId = params.get('id');
+        const whatsapp = params.get('wa');
+        
+        if (bookingId && whatsapp) {
+            // Auto fill form
+            const idInput = searchForm.querySelector('input[name="bookingId"]');
+            const waInput = searchForm.querySelector('input[name="whatsapp"]');
+            if (idInput && waInput) {
+                idInput.value = bookingId;
+                waInput.value = whatsapp;
+                // Auto submit
+                setTimeout(() => {
+                    searchForm.dispatchEvent(new Event('submit'));
+                }, 500);
+            }
+        }
+    }
+
+    // ========== INIT ==========
+    function init() {
+        console.log('✅ Status.js loaded successfully!');
+        console.log('📊 Using Local Storage key:', CONFIG.STORAGE_KEY || 'bookings_data');
+        
+        // Check URL params
+        checkUrlParams();
+    }
+
+    // ========== CONNECTION INDICATOR ==========
+    // Listen for connection changes
+    document.addEventListener('connection-change', function(e) {
+        const indicator = document.getElementById('conn-indicator');
+        if (!indicator) return;
+        
+        if (e.detail.online) {
+            indicator.textContent = '● LIVE';
+            indicator.className = 'conn-indicator online';
+        } else {
+            indicator.textContent = '⚠ OFFLINE (Fallback)';
+            indicator.className = 'conn-indicator offline';
+        }
+    });
+
+    // ========== START ==========
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+})();
