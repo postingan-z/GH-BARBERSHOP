@@ -7,141 +7,60 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
-/* ========== CSS STYLES ========== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: 'Manrope', sans-serif;
-  background: #f3f4f6;
-  color: #1f2937;
-  min-height: 100vh;
-}
+body { font-family: 'Manrope', sans-serif; background: #f3f4f6; color: #1f2937; min-height: 100vh; }
 .page { max-width: 800px; margin: 0 auto; padding: 20px 16px; }
 
-/* TOPBAR */
 .topbar {
-  display: flex;
-  align-items: center;
-  background: #1f2937;
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: 12px;
-  margin-bottom: 24px;
-  gap: 16px;
-  flex-wrap: wrap;
+  display: flex; align-items: center; background: #1f2937; color: #fff;
+  padding: 12px 20px; border-radius: 12px; margin-bottom: 24px; gap: 16px; flex-wrap: wrap;
 }
 .brand { font-size: 1.4rem; font-weight: 800; }
 .brand span { color: #f59e0b; }
 .navbar { display: flex; align-items: center; margin-left: auto; margin-right: 10px; }
 .nav-links { display: flex; list-style: none; gap: 6px; }
 .nav-links li a {
-  color: rgba(255,255,255,0.7);
-  text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 20px;
-  transition: all 0.3s ease;
+  color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.8rem;
+  font-weight: 600; padding: 6px 14px; border-radius: 20px; transition: all 0.3s ease;
 }
 .nav-links li a:hover { color: #fff; background: rgba(255,255,255,0.1); }
 .nav-links li a.active { color: #fff; background: rgba(255,255,255,0.15); }
-.conn-indicator {
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 4px 12px;
-  border-radius: 20px;
-}
+.conn-indicator { font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
 .conn-indicator.online { color: #22c55e; }
 .conn-indicator.offline { color: #ef4444; }
 
-/* CARD */
-.card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-}
+.card { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
 .card h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 4px; }
 .card .subtitle { color: #6b7280; font-size: 0.9rem; margin-bottom: 20px; }
 
-/* FIELD */
 .field { margin-bottom: 16px; }
 .field label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 4px; color: #374151; }
 .field input, .field select, .field textarea {
-  width: 100%;
-  padding: 10px 14px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-family: inherit;
-  transition: border-color 0.2s;
-  background: #fff;
+  width: 100%; padding: 10px 14px; border: 2px solid #e5e7eb; border-radius: 8px;
+  font-size: 0.95rem; font-family: inherit; transition: border-color 0.2s; background: #fff;
 }
-.field input:focus, .field select:focus, .field textarea:focus {
-  outline: none;
-  border-color: #2563eb;
-}
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: #2563eb; }
 .field textarea { min-height: 80px; resize: vertical; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
-/* SLOT GRID */
-.slot-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 10px;
-  margin-top: 8px;
-}
+.slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 8px; }
 .slot-item {
-  padding: 10px 12px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: #fff;
+  padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 8px; text-align: center;
+  cursor: pointer; transition: all 0.2s ease; background: #fff;
 }
-.slot-item.available:hover {
-  border-color: #6b7280;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-.slot-item.selected {
-  border-color: #2563eb;
-  background: #eff6ff;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-}
-.slot-item.unavailable {
-  background: #f3f4f6;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
+.slot-item.available:hover { border-color: #6b7280; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.slot-item.selected { border-color: #2563eb; background: #eff6ff; box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
+.slot-item.unavailable { background: #f3f4f6; cursor: not-allowed; opacity: 0.6; }
 .slot-time { display: block; font-weight: 600; font-size: 0.9rem; }
 .slot-info { display: block; font-size: 0.7rem; color: #6b7280; margin-top: 2px; }
-.slot-badge {
-  display: inline-block;
-  background: #ef4444;
-  color: #fff;
-  font-size: 0.6rem;
-  padding: 2px 8px;
-  border-radius: 12px;
-  margin-top: 4px;
-}
+.slot-badge { display: inline-block; background: #ef4444; color: #fff; font-size: 0.6rem; padding: 2px 8px; border-radius: 12px; margin-top: 4px; }
 .loading-row { grid-column: 1 / -1; text-align: center; padding: 20px; color: #6b7280; }
 .loading-row.error { color: #ef4444; }
 
-/* BUTTON */
 .btn {
-  display: inline-block;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: pointer;
-  text-decoration: none;
-  text-align: center;
-  transition: all 0.2s;
-  font-family: inherit;
+  display: inline-block; padding: 10px 20px; border: none; border-radius: 8px;
+  font-weight: 700; font-size: 0.9rem; cursor: pointer; text-decoration: none;
+  text-align: center; transition: all 0.2s; font-family: inherit;
 }
 .btn-primary { background: #2563eb; color: #fff; width: 100%; }
 .btn-primary:hover { background: #1d4ed8; }
@@ -151,23 +70,11 @@ body {
 .btn-outline { background: transparent; color: #374151; border: 2px solid #d1d5db; }
 .btn-outline:hover { background: #f3f4f6; }
 
-/* DETAIL ROW */
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #f3f4f6;
-}
+.detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
 .detail-row .label { color: #6b7280; font-weight: 500; }
 .detail-row .value { font-weight: 700; }
 
-.badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
+.badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; }
 .badge-PENDING { background: #fef3c7; color: #d97706; }
 .badge-CONFIRMED { background: #dbeafe; color: #2563eb; }
 .badge-COMPLETED { background: #d1fae5; color: #059669; }
@@ -175,37 +82,17 @@ body {
 .badge-REJECTED { background: #fee2e2; color: #dc2626; }
 .badge-RESCHEDULED { background: #ede9fe; color: #7c3aed; }
 
-/* TOAST */
-#toast-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+#toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
 .toast {
-  padding: 14px 20px;
-  border-radius: 8px;
-  color: #fff;
-  font-weight: 500;
-  font-size: 0.9rem;
-  min-width: 250px;
-  max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 14px 20px; border-radius: 8px; color: #fff; font-weight: 500; font-size: 0.9rem;
+  min-width: 250px; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   animation: slideIn 0.3s ease;
 }
 .toast-success { background: #22c55e; }
 .toast-error { background: #ef4444; }
 .toast-info { background: #3b82f6; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-@keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-/* RESPONSIVE */
 @media (max-width: 640px) {
   .topbar { flex-wrap: wrap; padding: 10px 16px; gap: 8px; }
   .navbar { order: 3; width: 100%; margin: 0; justify-content: center; }
@@ -220,7 +107,6 @@ body {
 <body>
 
 <div class="page">
-  <!-- TOPBAR / NAVBAR -->
   <div class="topbar">
     <div class="brand">Booking<span>.</span></div>
     <nav class="navbar">
@@ -233,11 +119,9 @@ body {
     <div id="conn-indicator" class="conn-indicator online">● LIVE</div>
   </div>
 
-  <!-- FORM BOOKING -->
   <div class="card" id="form-card">
     <h2>Buat Booking</h2>
     <p class="subtitle">Isi data di bawah, sistem akan mengecek ketersediaan slot secara real-time.</p>
-
     <form id="booking-form">
       <div class="field">
         <label>Nama Lengkap</label>
@@ -263,7 +147,6 @@ body {
           <option value="">Memuat layanan...</option>
         </select>
       </div>
-
       <div class="field">
         <label>Pilih Jam</label>
         <div id="slot-grid" class="slot-grid">
@@ -271,29 +154,25 @@ body {
         </div>
         <input type="hidden" name="jam" id="input-jam" required>
       </div>
-
       <div class="field">
         <label>Catatan (opsional)</label>
         <textarea name="catatan" placeholder="Tulis catatan tambahan..."></textarea>
       </div>
-
       <button type="submit" class="btn btn-primary" id="submit-btn">Buat Booking</button>
     </form>
   </div>
 
-  <!-- HASIL BOOKING -->
   <div class="card" id="result-card" style="display:none;">
-    <h2>Booking Berhasil Dibuat</h2>
+    <h2>✅ Booking Berhasil Dibuat</h2>
     <div class="detail-row"><span class="label">Booking ID</span><span class="value" id="res-id">-</span></div>
     <div class="detail-row"><span class="label">Nama</span><span class="value" id="res-nama">-</span></div>
     <div class="detail-row"><span class="label">Tanggal</span><span class="value" id="res-tanggal">-</span></div>
     <div class="detail-row"><span class="label">Jam</span><span class="value" id="res-jam">-</span></div>
     <div class="detail-row"><span class="label">Status</span><span class="value"><span class="badge badge-PENDING">PENDING</span></span></div>
-
     <div style="margin-top:18px; display:flex; flex-direction:column; gap:10px;">
-      <a class="btn btn-amber" id="res-wa-btn" target="_blank" rel="noopener">Kirim WhatsApp</a>
-      <a class="btn btn-outline" href="status.html" id="res-status-link">Cek Status Booking</a>
-      <button class="btn btn-outline" id="res-new-btn" type="button">Buat Booking Lain</button>
+      <a class="btn btn-amber" id="res-wa-btn" target="_blank" rel="noopener">📱 Kirim WhatsApp</a>
+      <a class="btn btn-outline" href="status.html" id="res-status-link">🔍 Cek Status Booking</a>
+      <button class="btn btn-outline" id="res-new-btn" type="button">📝 Buat Booking Lain</button>
     </div>
   </div>
 </div>
@@ -302,17 +181,16 @@ body {
 
 <script>
 // ========================================
-// BOOKING.JS - Terintegrasi dengan Google Apps Script
+// BOOKING.JS - FULL FIXED
 // ========================================
 
 (function() {
   'use strict';
 
   // ========== CONFIGURATION ==========
-  // Ganti dengan URL Web App Anda setelah deploy
+  // GANTI DENGAN URL WEB APP ANDA
   const API_URL = 'https://script.google.com/macros/s/AKfycbyERB6e2dgINlzPDbdo3Fp7x3D5IFwU29doPLgiDc_hqtKaWxbaolYeIaT9GPGJw0S3/exec';
-  
-  const WHATSAPP_ADMIN = '62812xxxxxxx'; // Ganti dengan nomor admin
+  const WHATSAPP_ADMIN = '6281234567890';
 
   // ========== DOM REFS ==========
   const form = document.getElementById('booking-form');
@@ -339,14 +217,14 @@ body {
   function toast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     if (!container) return;
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = message;
-    container.appendChild(toast);
+    const el = document.createElement('div');
+    el.className = `toast toast-${type}`;
+    el.textContent = message;
+    container.appendChild(el);
     setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateX(100%)';
-      setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 300);
+      el.style.opacity = '0';
+      el.style.transform = 'translateX(100%)';
+      setTimeout(() => { if (container.contains(el)) container.removeChild(el); }, 300);
     }, 3000);
   }
 
@@ -356,29 +234,18 @@ body {
       const url = new URL(API_URL);
       url.searchParams.set('action', action);
       
-      // For GET requests, add params to URL
-      const isGet = !params || Object.keys(params).length === 0;
-      if (!isGet) {
-        // POST request - send as JSON body
-        const response = await fetch(url.toString(), {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action, ...params })
-        });
-        const data = await response.json();
-        console.log(`📡 [${action}] Response:`, data);
-        return data;
-      } else {
-        // GET request
-        Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
-        const response = await fetch(url.toString());
-        const data = await response.json();
-        console.log(`📡 [${action}] Response:`, data);
-        return data;
-      }
+      const response = await fetch(url.toString(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action, ...params })
+      });
+      
+      const data = await response.json();
+      console.log(`📡 [${action}] Response:`, data);
+      return data;
     } catch (error) {
       console.error(`❌ [${action}] Error:`, error);
-      return { success: false, message: 'Koneksi ke server gagal' };
+      return { success: false, message: 'Koneksi ke server gagal: ' + error.message };
     }
   }
 
@@ -395,6 +262,17 @@ body {
           selectLayanan.appendChild(option);
         });
         console.log('✅ Layanan loaded:', response.services.length);
+      } else {
+        console.warn('⚠️ Gagal load layanan:', response.message);
+        // Fallback default
+        const defaults = ['Potong Rambut', 'Creambath', 'Cat Rambut', 'Smoothing', 'Hair Treatment', 'Full Package'];
+        selectLayanan.innerHTML = '<option value="">Pilih Layanan</option>';
+        defaults.forEach(service => {
+          const option = document.createElement('option');
+          option.value = service;
+          option.textContent = service;
+          selectLayanan.appendChild(option);
+        });
       }
     } catch (error) {
       console.error('Error loading layanan:', error);
@@ -417,14 +295,14 @@ body {
       const response = await callAPI('getAvailability', { tanggal });
       
       if (!response.success) {
-        slotGrid.innerHTML = `<div class="loading-row error">${response.message || 'Gagal memuat slot'}</div>`;
+        slotGrid.innerHTML = `<div class="loading-row error">❌ ${response.message || 'Gagal memuat slot'}</div>`;
         return;
       }
 
       renderSlots(response.availability || []);
     } catch (error) {
       console.error('Error loading slots:', error);
-      slotGrid.innerHTML = '<div class="loading-row error">Gagal memuat jam tersedia</div>';
+      slotGrid.innerHTML = '<div class="loading-row error">❌ Gagal memuat jam tersedia</div>';
     }
   }
 
@@ -458,7 +336,7 @@ body {
     slotGrid.innerHTML = html;
 
     if (!hasAvailable) {
-      slotGrid.innerHTML = '<div class="loading-row">Maaf, semua jam sudah penuh untuk tanggal ini</div>';
+      slotGrid.innerHTML = '<div class="loading-row">❌ Maaf, semua jam sudah penuh untuk tanggal ini</div>';
       return;
     }
 
@@ -498,38 +376,28 @@ body {
     const nama = formData.get('nama').trim();
     const whatsapp = formData.get('whatsapp').trim();
     const tanggal = formData.get('tanggal');
-    const jumlah = parseInt(formData.get('jumlah'));
+    const jumlah = parseInt(formData.get('jumlah')) || 1;
     const layanan = formData.get('layanan');
     const catatan = formData.get('catatan').trim() || '-';
 
-    if (!selectedJam) {
-      toast('Silakan pilih jam terlebih dahulu', 'error');
-      return;
-    }
-
+    if (!nama) { toast('Nama lengkap wajib diisi', 'error'); return; }
+    if (!whatsapp) { toast('Nomor WhatsApp wajib diisi', 'error'); return; }
     if (!/^[0-9]{10,15}$/.test(whatsapp)) {
       toast('Nomor WhatsApp tidak valid (min 10 digit)', 'error');
       return;
     }
+    if (!selectedJam) { toast('Silakan pilih jam terlebih dahulu', 'error'); return; }
+    if (!layanan) { toast('Silakan pilih layanan', 'error'); return; }
 
     submitBtn.disabled = true;
     submitBtn.textContent = '⏳ Memproses...';
 
     try {
-      const bookingData = {
-        nama,
-        whatsapp,
-        tanggal,
-        jam: selectedJam,
-        jumlah,
-        layanan,
-        catatan
-      };
-
+      const bookingData = { nama, whatsapp, tanggal, jam: selectedJam, jumlah, layanan, catatan };
       const response = await callAPI('createBooking', bookingData);
 
       if (!response.success) {
-        toast(response.message || 'Gagal membuat booking', 'error');
+        toast('❌ ' + (response.message || 'Gagal membuat booking'), 'error');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Buat Booking';
         return;
@@ -541,7 +409,7 @@ body {
 
     } catch (error) {
       console.error('Error creating booking:', error);
-      toast('Terjadi kesalahan, silakan coba lagi', 'error');
+      toast('❌ Terjadi kesalahan, silakan coba lagi', 'error');
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Buat Booking';
@@ -604,17 +472,12 @@ Mohon tunggu konfirmasi dari kami.`;
 
   // ========== INIT ==========
   async function init() {
-    // Set default date to tomorrow
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().split('T')[0];
-    inputTanggal.value = tomorrowStr;
-    inputTanggal.min = tomorrowStr;
+    inputTanggal.value = tomorrow.toISOString().split('T')[0];
+    inputTanggal.min = tomorrow.toISOString().split('T')[0];
 
-    // Load layanan
     await loadLayanan();
-    
-    // Load slots after layanan loaded
     setTimeout(loadSlots, 500);
 
     console.log('✅ Booking page loaded!');
@@ -629,6 +492,5 @@ Mohon tunggu konfirmasi dari kami.`;
 
 })();
 </script>
-
 </body>
 </html>
