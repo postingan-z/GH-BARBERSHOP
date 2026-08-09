@@ -8,24 +8,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
 /* ========== CSS STYLES ========== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+* { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: 'Manrope', sans-serif;
   background: #f3f4f6;
   color: #1f2937;
   min-height: 100vh;
 }
-
-.page {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px 16px;
-}
+.page { max-width: 800px; margin: 0 auto; padding: 20px 16px; }
 
 /* TOPBAR */
 .topbar {
@@ -39,28 +29,10 @@ body {
   gap: 16px;
   flex-wrap: wrap;
 }
-
-.brand {
-  font-size: 1.4rem;
-  font-weight: 800;
-}
-.brand span {
-  color: #f59e0b;
-}
-
-.navbar {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-  margin-right: 10px;
-}
-
-.nav-links {
-  display: flex;
-  list-style: none;
-  gap: 6px;
-}
-
+.brand { font-size: 1.4rem; font-weight: 800; }
+.brand span { color: #f59e0b; }
+.navbar { display: flex; align-items: center; margin-left: auto; margin-right: 10px; }
+.nav-links { display: flex; list-style: none; gap: 6px; }
 .nav-links li a {
   color: rgba(255,255,255,0.7);
   text-decoration: none;
@@ -70,30 +42,16 @@ body {
   border-radius: 20px;
   transition: all 0.3s ease;
 }
-
-.nav-links li a:hover {
-  color: #fff;
-  background: rgba(255,255,255,0.1);
-}
-
-.nav-links li a.active {
-  color: #fff;
-  background: rgba(255,255,255,0.15);
-}
-
+.nav-links li a:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.nav-links li a.active { color: #fff; background: rgba(255,255,255,0.15); }
 .conn-indicator {
   font-size: 0.75rem;
   font-weight: 700;
   padding: 4px 12px;
   border-radius: 20px;
-  letter-spacing: 0.5px;
 }
-.conn-indicator.online {
-  color: #22c55e;
-}
-.conn-indicator.offline {
-  color: #ef4444;
-}
+.conn-indicator.online { color: #22c55e; }
+.conn-indicator.offline { color: #ef4444; }
 
 /* CARD */
 .card {
@@ -103,31 +61,13 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   margin-bottom: 20px;
 }
-.card h2 {
-  font-size: 1.4rem;
-  font-weight: 800;
-  margin-bottom: 4px;
-}
-.card .subtitle {
-  color: #6b7280;
-  font-size: 0.9rem;
-  margin-bottom: 20px;
-}
+.card h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 4px; }
+.card .subtitle { color: #6b7280; font-size: 0.9rem; margin-bottom: 20px; }
 
 /* FIELD */
-.field {
-  margin-bottom: 16px;
-}
-.field label {
-  display: block;
-  font-weight: 600;
-  font-size: 0.85rem;
-  margin-bottom: 4px;
-  color: #374151;
-}
-.field input,
-.field select,
-.field textarea {
+.field { margin-bottom: 16px; }
+.field label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 4px; color: #374151; }
+.field input, .field select, .field textarea {
   width: 100%;
   padding: 10px 14px;
   border: 2px solid #e5e7eb;
@@ -137,22 +77,12 @@ body {
   transition: border-color 0.2s;
   background: #fff;
 }
-.field input:focus,
-.field select:focus,
-.field textarea:focus {
+.field input:focus, .field select:focus, .field textarea:focus {
   outline: none;
   border-color: #2563eb;
 }
-.field textarea {
-  min-height: 80px;
-  resize: vertical;
-}
-
-.field-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
+.field textarea { min-height: 80px; resize: vertical; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
 /* SLOT GRID */
 .slot-grid {
@@ -161,7 +91,6 @@ body {
   gap: 10px;
   margin-top: 8px;
 }
-
 .slot-item {
   padding: 10px 12px;
   border: 2px solid #e5e7eb;
@@ -171,38 +100,23 @@ body {
   transition: all 0.2s ease;
   background: #fff;
 }
-
 .slot-item.available:hover {
   border-color: #6b7280;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-
 .slot-item.selected {
   border-color: #2563eb;
   background: #eff6ff;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
-
 .slot-item.unavailable {
   background: #f3f4f6;
   cursor: not-allowed;
   opacity: 0.6;
 }
-
-.slot-time {
-  display: block;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.slot-info {
-  display: block;
-  font-size: 0.7rem;
-  color: #6b7280;
-  margin-top: 2px;
-}
-
+.slot-time { display: block; font-weight: 600; font-size: 0.9rem; }
+.slot-info { display: block; font-size: 0.7rem; color: #6b7280; margin-top: 2px; }
 .slot-badge {
   display: inline-block;
   background: #ef4444;
@@ -212,16 +126,8 @@ body {
   border-radius: 12px;
   margin-top: 4px;
 }
-
-.loading-row {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 20px;
-  color: #6b7280;
-}
-.loading-row.error {
-  color: #ef4444;
-}
+.loading-row { grid-column: 1 / -1; text-align: center; padding: 20px; color: #6b7280; }
+.loading-row.error { color: #ef4444; }
 
 /* BUTTON */
 .btn {
@@ -237,33 +143,13 @@ body {
   transition: all 0.2s;
   font-family: inherit;
 }
-.btn-primary {
-  background: #2563eb;
-  color: #fff;
-  width: 100%;
-}
-.btn-primary:hover {
-  background: #1d4ed8;
-}
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-.btn-amber {
-  background: #f59e0b;
-  color: #fff;
-}
-.btn-amber:hover {
-  background: #d97706;
-}
-.btn-outline {
-  background: transparent;
-  color: #374151;
-  border: 2px solid #d1d5db;
-}
-.btn-outline:hover {
-  background: #f3f4f6;
-}
+.btn-primary { background: #2563eb; color: #fff; width: 100%; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-amber { background: #f59e0b; color: #fff; }
+.btn-amber:hover { background: #d97706; }
+.btn-outline { background: transparent; color: #374151; border: 2px solid #d1d5db; }
+.btn-outline:hover { background: #f3f4f6; }
 
 /* DETAIL ROW */
 .detail-row {
@@ -272,13 +158,8 @@ body {
   padding: 10px 0;
   border-bottom: 1px solid #f3f4f6;
 }
-.detail-row .label {
-  color: #6b7280;
-  font-weight: 500;
-}
-.detail-row .value {
-  font-weight: 700;
-}
+.detail-row .label { color: #6b7280; font-weight: 500; }
+.detail-row .value { font-weight: 700; }
 
 .badge {
   display: inline-block;
@@ -287,30 +168,12 @@ body {
   font-size: 0.75rem;
   font-weight: 700;
 }
-.badge-PENDING {
-  background: #fef3c7;
-  color: #d97706;
-}
-.badge-CONFIRMED {
-  background: #dbeafe;
-  color: #2563eb;
-}
-.badge-COMPLETED {
-  background: #d1fae5;
-  color: #059669;
-}
-.badge-CANCELLED {
-  background: #f3f4f6;
-  color: #6b7280;
-}
-.badge-REJECTED {
-  background: #fee2e2;
-  color: #dc2626;
-}
-.badge-RESCHEDULED {
-  background: #ede9fe;
-  color: #7c3aed;
-}
+.badge-PENDING { background: #fef3c7; color: #d97706; }
+.badge-CONFIRMED { background: #dbeafe; color: #2563eb; }
+.badge-COMPLETED { background: #d1fae5; color: #059669; }
+.badge-CANCELLED { background: #f3f4f6; color: #6b7280; }
+.badge-REJECTED { background: #fee2e2; color: #dc2626; }
+.badge-RESCHEDULED { background: #ede9fe; color: #7c3aed; }
 
 /* TOAST */
 #toast-container {
@@ -344,35 +207,13 @@ body {
 
 /* RESPONSIVE */
 @media (max-width: 640px) {
-  .topbar {
-    flex-wrap: wrap;
-    padding: 10px 16px;
-    gap: 8px;
-  }
-  .navbar {
-    order: 3;
-    width: 100%;
-    margin: 0;
-    justify-content: center;
-  }
-  .nav-links li a {
-    font-size: 0.7rem;
-    padding: 4px 10px;
-  }
-  .field-row {
-    grid-template-columns: 1fr;
-  }
-  .slot-grid {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  }
-  .card {
-    padding: 16px;
-  }
-  .toast {
-    min-width: 200px;
-    font-size: 0.8rem;
-    padding: 12px 16px;
-  }
+  .topbar { flex-wrap: wrap; padding: 10px 16px; gap: 8px; }
+  .navbar { order: 3; width: 100%; margin: 0; justify-content: center; }
+  .nav-links li a { font-size: 0.7rem; padding: 4px 10px; }
+  .field-row { grid-template-columns: 1fr; }
+  .slot-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+  .card { padding: 16px; }
+  .toast { min-width: 200px; font-size: 0.8rem; padding: 12px 16px; }
 }
 </style>
 </head>
@@ -419,13 +260,7 @@ body {
       <div class="field">
         <label>Jenis Layanan</label>
         <select name="layanan" id="select-layanan" required>
-          <option value="">Pilih Layanan</option>
-          <option value="Potong Rambut">Potong Rambut</option>
-          <option value="Creambath">Creambath</option>
-          <option value="Cat Rambut">Cat Rambut</option>
-          <option value="Smoothing">Smoothing</option>
-          <option value="Hair Treatment">Hair Treatment</option>
-          <option value="Full Package">Full Package</option>
+          <option value="">Memuat layanan...</option>
         </select>
       </div>
 
@@ -467,20 +302,17 @@ body {
 
 <script>
 // ========================================
-// ALL JAVASCRIPT LOGIC - TANPA LOGIN
+// BOOKING.JS - Terintegrasi dengan Google Apps Script
 // ========================================
 
 (function() {
   'use strict';
 
   // ========== CONFIGURATION ==========
-  const CONFIG = {
-    WHATSAPP_ADMIN_NUMBER: '6281234567890',
-    OPERATIONAL_HOURS: { start: '08:00', end: '21:00' },
-    SLOT_DURATION: 60,
-    MAX_CAPACITY: 10,
-    STORAGE_KEY: 'bookings_data'
-  };
+  // Ganti dengan URL Web App Anda setelah deploy
+  const API_URL = 'https://script.google.com/macros/s/AKfycbyERB6e2dgINlzPDbdo3Fp7x3D5IFwU29doPLgiDc_hqtKaWxbaolYeIaT9GPGJw0S3/exec';
+  
+  const WHATSAPP_ADMIN = '62812xxxxxxx'; // Ganti dengan nomor admin
 
   // ========== DOM REFS ==========
   const form = document.getElementById('booking-form');
@@ -503,42 +335,10 @@ body {
   let selectedJam = null;
   let currentBooking = null;
 
-  // ========== LOCAL STORAGE ==========
-  function getBookings() {
-    try {
-      const data = localStorage.getItem(CONFIG.STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
-    } catch { return []; }
-  }
-
-  function saveBookings(bookings) {
-    localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(bookings));
-  }
-
-  function generateId() {
-    return 'BK' + Date.now().toString(36).toUpperCase() + 
-           Math.random().toString(36).substring(2, 5).toUpperCase();
-  }
-
-  function generateTimeSlots() {
-    const slots = [];
-    const start = CONFIG.OPERATIONAL_HOURS.start;
-    const end = CONFIG.OPERATIONAL_HOURS.end;
-    const duration = CONFIG.SLOT_DURATION;
-    
-    let current = new Date(`2000-01-01 ${start}`);
-    const endTime = new Date(`2000-01-01 ${end}`);
-    
-    while (current < endTime) {
-      slots.push(current.toTimeString().slice(0, 5));
-      current.setMinutes(current.getMinutes() + duration);
-    }
-    return slots;
-  }
-
   // ========== TOAST ==========
   function toast(message, type = 'info') {
     const container = document.getElementById('toast-container');
+    if (!container) return;
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
@@ -550,15 +350,59 @@ body {
     }, 3000);
   }
 
-  // ========== CONNECTION STATUS ==========
-  function updateConnectionStatus(online) {
-    connIndicator.className = `conn-indicator ${online ? 'online' : 'offline'}`;
-    connIndicator.textContent = online ? '● LIVE' : '● OFFLINE';
+  // ========== API CALL ==========
+  async function callAPI(action, params = {}) {
+    try {
+      const url = new URL(API_URL);
+      url.searchParams.set('action', action);
+      
+      // For GET requests, add params to URL
+      const isGet = !params || Object.keys(params).length === 0;
+      if (!isGet) {
+        // POST request - send as JSON body
+        const response = await fetch(url.toString(), {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action, ...params })
+        });
+        const data = await response.json();
+        console.log(`📡 [${action}] Response:`, data);
+        return data;
+      } else {
+        // GET request
+        Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
+        const response = await fetch(url.toString());
+        const data = await response.json();
+        console.log(`📡 [${action}] Response:`, data);
+        return data;
+      }
+    } catch (error) {
+      console.error(`❌ [${action}] Error:`, error);
+      return { success: false, message: 'Koneksi ke server gagal' };
+    }
   }
-  updateConnectionStatus(true);
+
+  // ========== LOAD LAYANAN ==========
+  async function loadLayanan() {
+    try {
+      const response = await callAPI('getServices');
+      if (response.success && response.services) {
+        selectLayanan.innerHTML = '<option value="">Pilih Layanan</option>';
+        response.services.forEach(service => {
+          const option = document.createElement('option');
+          option.value = service.nama || service;
+          option.textContent = service.nama || service;
+          selectLayanan.appendChild(option);
+        });
+        console.log('✅ Layanan loaded:', response.services.length);
+      }
+    } catch (error) {
+      console.error('Error loading layanan:', error);
+    }
+  }
 
   // ========== LOAD SLOTS ==========
-  function loadSlots() {
+  async function loadSlots() {
     const tanggal = inputTanggal.value;
     const layanan = selectLayanan.value;
 
@@ -567,54 +411,45 @@ body {
       return;
     }
 
-    slotGrid.innerHTML = '<div class="loading-row">Memuat jam tersedia...</div>';
+    slotGrid.innerHTML = '<div class="loading-row">⏳ Memuat jam tersedia...</div>';
 
-    // Simulasi loading
-    setTimeout(() => {
-      const bookings = getBookings();
-      const allSlots = generateTimeSlots();
+    try {
+      const response = await callAPI('getAvailability', { tanggal });
       
-      const existingBookings = bookings.filter(b => 
-        b.tanggal === tanggal && 
-        b.layanan === layanan &&
-        (b.status === 'PENDING' || b.status === 'CONFIRMED' || b.status === 'RESCHEDULED')
-      );
+      if (!response.success) {
+        slotGrid.innerHTML = `<div class="loading-row error">${response.message || 'Gagal memuat slot'}</div>`;
+        return;
+      }
 
-      const availableSlots = allSlots.map(slot => {
-        const count = existingBookings.filter(b => b.jam === slot).length;
-        return {
-          time: slot,
-          available: count < CONFIG.MAX_CAPACITY,
-          booked: count,
-          max: CONFIG.MAX_CAPACITY
-        };
-      });
-
-      renderSlots(availableSlots);
-    }, 300);
+      renderSlots(response.availability || []);
+    } catch (error) {
+      console.error('Error loading slots:', error);
+      slotGrid.innerHTML = '<div class="loading-row error">Gagal memuat jam tersedia</div>';
+    }
   }
 
-  function renderSlots(slots) {
-    if (!slots || slots.length === 0) {
-      slotGrid.innerHTML = '<div class="loading-row">Tidak ada jam tersedia</div>';
+  function renderSlots(availability) {
+    if (!availability || availability.length === 0) {
+      slotGrid.innerHTML = '<div class="loading-row">Tidak ada jam tersedia untuk tanggal ini</div>';
       return;
     }
 
     let html = '';
     let hasAvailable = false;
 
-    slots.forEach(slot => {
-      const isAvailable = slot.available !== false;
-      const isSelected = selectedJam === slot.time;
+    availability.forEach(slot => {
+      const isAvailable = !slot.penuh;
+      const isSelected = selectedJam === slot.jam;
+      
       if (isAvailable) hasAvailable = true;
 
       html += `
         <div class="slot-item ${isAvailable ? 'available' : 'unavailable'} ${isSelected ? 'selected' : ''}"
-             data-time="${slot.time}"
+             data-time="${slot.jam}"
              data-available="${isAvailable}"
              ${!isAvailable ? 'style="cursor:not-allowed;opacity:0.5;"' : ''}>
-          <span class="slot-time">${slot.time}</span>
-          ${slot.booked !== undefined ? `<span class="slot-info">${slot.booked}/${slot.max}</span>` : ''}
+          <span class="slot-time">${slot.jam}</span>
+          <span class="slot-info">${slot.terisi}/${slot.kapasitas}</span>
           ${isAvailable ? '' : '<span class="slot-badge">Full</span>'}
         </div>
       `;
@@ -623,7 +458,7 @@ body {
     slotGrid.innerHTML = html;
 
     if (!hasAvailable) {
-      slotGrid.innerHTML = '<div class="loading-row">Maaf, semua jam sudah penuh</div>';
+      slotGrid.innerHTML = '<div class="loading-row">Maaf, semua jam sudah penuh untuk tanggal ini</div>';
       return;
     }
 
@@ -656,7 +491,7 @@ body {
   });
 
   // ========== SUBMIT ==========
-  form.addEventListener('submit', function(e) {
+  form.addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const formData = new FormData(form);
@@ -678,38 +513,39 @@ body {
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Memproses...';
+    submitBtn.textContent = '⏳ Memproses...';
 
-    setTimeout(() => {
-      try {
-        const bookings = getBookings();
-        const newBooking = {
-          bookingId: generateId(),
-          nama,
-          whatsapp,
-          tanggal,
-          jam: selectedJam,
-          jumlah,
-          layanan,
-          catatan,
-          status: 'PENDING',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
+    try {
+      const bookingData = {
+        nama,
+        whatsapp,
+        tanggal,
+        jam: selectedJam,
+        jumlah,
+        layanan,
+        catatan
+      };
 
-        bookings.push(newBooking);
-        saveBookings(bookings);
+      const response = await callAPI('createBooking', bookingData);
 
-        currentBooking = newBooking;
-        showResult(newBooking);
-        toast('Booking berhasil dibuat!', 'success');
-      } catch (error) {
-        toast('Terjadi kesalahan, silakan coba lagi', 'error');
-      } finally {
+      if (!response.success) {
+        toast(response.message || 'Gagal membuat booking', 'error');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Buat Booking';
+        return;
       }
-    }, 500);
+
+      currentBooking = response.booking;
+      showResult(currentBooking);
+      toast('✅ Booking berhasil dibuat!', 'success');
+
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      toast('Terjadi kesalahan, silakan coba lagi', 'error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Buat Booking';
+    }
   });
 
   // ========== SHOW RESULT ==========
@@ -722,18 +558,17 @@ body {
     resTanggal.textContent = booking.tanggal;
     resJam.textContent = booking.jam;
 
-    const waNumber = CONFIG.WHATSAPP_ADMIN_NUMBER;
     const message = `Halo *${booking.nama}*, booking Anda telah kami terima dengan ID: *${booking.bookingId}*
 
 📅 Tanggal: ${booking.tanggal}
 🕐 Jam: ${booking.jam}
-👥 Jumlah: ${booking.jumlah} orang
+👥 Jumlah: ${booking.jumlah || 1} orang
 💇 Layanan: ${booking.layanan}
 
-📌 Status: PENDING
+📌 Status: ${booking.status || 'PENDING'}
 Mohon tunggu konfirmasi dari kami.`;
 
-    resWaBtn.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+    resWaBtn.href = `https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(message)}`;
 
     resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
@@ -759,17 +594,38 @@ Mohon tunggu konfirmasi dari kami.`;
     }
   });
 
+  // ========== CONNECTION INDICATOR ==========
+  function updateConnectionStatus(online) {
+    if (!connIndicator) return;
+    connIndicator.textContent = online ? '● LIVE' : '⚠ OFFLINE';
+    connIndicator.className = `conn-indicator ${online ? 'online' : 'offline'}`;
+  }
+  updateConnectionStatus(true);
+
   // ========== INIT ==========
-  (function init() {
+  async function init() {
+    // Set default date to tomorrow
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    inputTanggal.value = tomorrow.toISOString().split('T')[0];
-    inputTanggal.min = tomorrow.toISOString().split('T')[0];
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    inputTanggal.value = tomorrowStr;
+    inputTanggal.min = tomorrowStr;
+
+    // Load layanan
+    await loadLayanan();
     
-    console.log('✅ Booking page loaded successfully!');
-    console.log('📊 Data disimpan di Local Storage dengan key:', CONFIG.STORAGE_KEY);
-    console.log('🔓 Tidak perlu login - semua orang bisa booking!');
-  })();
+    // Load slots after layanan loaded
+    setTimeout(loadSlots, 500);
+
+    console.log('✅ Booking page loaded!');
+    console.log('📡 API URL:', API_URL);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 
 })();
 </script>
