@@ -1,117 +1,9 @@
 /**
- * ADMIN.JS - Logika halaman admin.html
- * Menggunakan Local Storage sebagai database
+ * ADMIN.JS - logika halaman admin.html
+ * Terintegrasi dengan API dan Local Storage fallback
  */
 (function() {
     'use strict';
-
-    // ========== CONFIGURATION ==========
-    const CONFIG = {
-        ADMIN_PASSWORD: 'admin123',
-        STORAGE_KEY: 'bookings_data',
-        WHATSAPP_ADMIN_NUMBER: '6281234567890',
-        POLLING_INTERVAL_MS: 3000
-    };
-
-    // ========== LOCAL STORAGE HELPERS ==========
-    function getBookings() {
-        try {
-            const data = localStorage.getItem(CONFIG.STORAGE_KEY);
-            return data ? JSON.parse(data) : [];
-        } catch (e) {
-            return [];
-        }
-    }
-
-    function saveBookings(bookings) {
-        localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(bookings));
-    }
-
-    // ========== WHATSAPP TEMPLATES ==========
-    const WA_TEMPLATES = {
-        'new': function(booking) {
-            return `Halo *${booking.nama}*, booking Anda telah kami terima dengan ID: *${booking.bookingId}*
-
-📅 Tanggal: ${booking.tanggal}
-🕐 Jam: ${booking.jam}
-👥 Jumlah: ${booking.jumlah} orang
-💇 Layanan: ${booking.layanan}
-
-📌 Status: ${booking.status}
-Mohon tunggu konfirmasi dari kami.`;
-        },
-        'PENDING': function(booking) {
-            return `Halo *${booking.nama}*, booking Anda dengan ID: *${booking.bookingId}* masih dalam status PENDING.
-
-📅 Tanggal: ${booking.tanggal}
-🕐 Jam: ${booking.jam}
-👥 Jumlah: ${booking.jumlah} orang
-💇 Layanan: ${booking.layanan}
-
-Mohon tunggu konfirmasi dari kami.`;
-        },
-        'CONFIRMED': function(booking) {
-            return `Halo *${booking.nama}*, booking Anda dengan ID: *${booking.bookingId}* telah dikonfirmasi! ✅
-
-📅 Tanggal: ${booking.tanggal}
-🕐 Jam: ${booking.jam}
-👥 Jumlah: ${booking.jumlah} orang
-💇 Layanan: ${booking.layanan}
-
-Silakan datang tepat waktu. Terima kasih!`;
-        },
-        'RESCHEDULED': function(booking) {
-            return `Halo *${booking.nama}*, booking Anda dengan ID: *${booking.bookingId}* telah dijadwalkan ulang. 🔄
-
-📅 Tanggal baru: ${booking.tanggal}
-🕐 Jam baru: ${booking.jam}
-👥 Jumlah: ${booking.jumlah} orang
-💇 Layanan: ${booking.layanan}
-
-Mohon konfirmasi kembali. Terima kasih!`;
-        },
-        'COMPLETED': function(booking) {
-            return `Halo *${booking.nama}*, booking Anda dengan ID: *${booking.bookingId}* telah selesai. ✅
-
-Terima kasih telah menggunakan layanan kami! 🙏`;
-        },
-        'CANCELLED': function(booking) {
-            return `Halo *${booking.nama}*, booking Anda dengan ID: *${booking.bookingId}* telah dibatalkan. ❌
-
-📌 Alasan: ${booking.alasan || '-'}
-
-Untuk informasi lebih lanjut, silakan hubungi kami.`;
-        },
-        'REJECTED': function(booking) {
-            return `Halo *${booking.nama}*, mohon maaf booking Anda dengan ID: *${booking.bookingId}* tidak dapat kami terima. ❌
-
-📌 Alasan: ${booking.alasan || '-'}
-
-Silakan coba tanggal/jam lain atau hubungi kami untuk informasi lebih lanjut.`;
-        }
-    };
-
-    // ========== TOAST NOTIFICATION ==========
-    function toast(message, type = 'info') {
-        const container = document.getElementById('toast-container');
-        if (!container) return;
-        
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.textContent = message;
-        
-        container.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                if (container.contains(toast)) {
-                    container.removeChild(toast);
-                }
-            }, 300);
-        }, 3000);
-    }
 
     // ========== DOM REFS ==========
     const loginWrap = document.getElementById('login-wrap');
@@ -120,6 +12,22 @@ Silakan coba tanggal/jam lain atau hubungi kami untuk informasi lebih lanjut.`;
     const loginBtn = document.getElementById('login-btn');
     const logoutBtn = document.getElementById('logout-btn');
     const tbody = document.getElementById('booking-tbody');
+    const connIndicator = document.getElementById('conn-indicator');
+
+    // Modal elements
+    const rescheduleModal = document.getElementById('reschedule-modal');
+    const rsBookingId = document.getElementById('rs-booking-id');
+    const rsTanggal = document.getElementById('rs-tanggal');
+    const rsJam = document.getElementById('rs-jam');
+    const rsCancelBtn = document.getElementById('rs-cancel-btn');
+    const rsSubmitBtn = document.getElementById('rs-submit-btn');
+
+    const reasonModal = document.getElementById('reason-modal');
+    const reasonTitle = document.getElementById('reason-title');
+    const rnBookingId = document.getElementById('rn-booking-id');
+    const rnAlasan = document.getElementById('rn-alasan');
+    const rnCancelBtn = document.getElementById('rn-cancel-btn');
+    const rnSubmitBtn = document.getElementById('rn-submit-btn');
 
     // ========== STATE ==========
     let token = sessionStorage.getItem('admin_token') || null;
@@ -127,28 +35,38 @@ Silakan coba tanggal/jam lain atau hubungi kami untuk informasi lebih lanjut.`;
     let currentBookings = [];
     let lastRenderHash = '';
     let actionTargetId = null;
+    let reasonMode = 'cancel';
 
     // ========== LOGIN ==========
-    loginForm.addEventListener('submit', function(e) {
+    loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const password = new FormData(e.target).get('password');
 
         loginBtn.disabled = true;
         loginBtn.textContent = 'Memeriksa...';
 
-        // Simulasi login
-        setTimeout(() => {
-            if (password === CONFIG.ADMIN_PASSWORD) {
-                token = 'admin_' + Date.now();
-                sessionStorage.setItem('admin_token', token);
-                toast('Login berhasil!', 'success');
-                enterDashboard();
-            } else {
-                toast('Password salah!', 'error');
+        try {
+            const res = await API.adminLogin(password);
+
+            if (!res.success) {
+                toast(res.message || 'Login gagal.', 'error');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Masuk';
+                return;
             }
+
+            token = res.token;
+            sessionStorage.setItem('admin_token', token);
+            toast('Login berhasil!', 'success');
+            enterDashboard();
+
+        } catch (error) {
+            console.error('Login error:', error);
+            toast('Terjadi kesalahan, silakan coba lagi', 'error');
+        } finally {
             loginBtn.disabled = false;
             loginBtn.textContent = 'Masuk';
-        }, 500);
+        }
     });
 
     // ========== LOGOUT ==========
@@ -174,33 +92,40 @@ Silakan coba tanggal/jam lain atau hubungi kami untuk informasi lebih lanjut.`;
         
         // Start polling
         if (pollHandle) clearInterval(pollHandle);
-        pollHandle = setInterval(refreshAll, CONFIG.POLLING_INTERVAL_MS);
+        pollHandle = setInterval(refreshAll, CONFIG.POLLING_INTERVAL_MS || 4000);
     }
 
     // ========== REFRESH ALL ==========
-    function refreshAll() {
-        const bookings = getBookings();
-        renderStats(bookings);
-        renderTable(bookings);
+    async function refreshAll() {
+        try {
+            const [statsRes, bookingsRes] = await Promise.all([
+                API.getDashboard(token),
+                API.getBookings(token)
+            ]);
+
+            if (!statsRes.success || !bookingsRes.success) {
+                // Check if unauthorized
+                const msg = statsRes.message || bookingsRes.message || '';
+                if (msg.includes('Unauthorized') || msg.includes('token')) {
+                    toast('Sesi admin berakhir, silakan login ulang.', 'error');
+                    logoutBtn.click();
+                }
+                return;
+            }
+
+            renderStats(statsRes.stats);
+            renderTable(bookingsRes.bookings);
+
+        } catch (error) {
+            console.error('Refresh error:', error);
+            // Don't show error toast to avoid spam
+        }
     }
 
     // ========== RENDER STATS ==========
-    function renderStats(bookings) {
-        const stats = {
-            total: bookings.length,
-            PENDING: 0,
-            CONFIRMED: 0,
-            RESCHEDULED: 0,
-            CANCELLED: 0,
-            REJECTED: 0,
-            COMPLETED: 0
-        };
-
-        bookings.forEach(b => {
-            if (stats[b.status] !== undefined) stats[b.status]++;
-        });
-
-        ['total', 'PENDING', 'CONFIRMED', 'RESCHEDULED', 'CANCELLED', 'REJECTED', 'COMPLETED'].forEach(function(k) {
+    function renderStats(stats) {
+        const keys = ['total', 'PENDING', 'CONFIRMED', 'RESCHEDULED', 'CANCELLED', 'REJECTED', 'COMPLETED'];
+        keys.forEach(function(k) {
             const el = document.getElementById('s-' + k);
             if (el) el.textContent = stats[k] ?? 0;
         });
@@ -214,17 +139,48 @@ Silakan coba tanggal/jam lain atau hubungi kami untuk informasi lebih lanjut.`;
         lastRenderHash = hash;
         currentBookings = bookings;
 
-        if (!bookings.length) {
+        if (!bookings || bookings.length === 0) {
             tbody.innerHTML = '<tr><td colspan="10" class="loading-row">Belum ada booking.</td></tr>';
             return;
         }
 
         // Sort by newest first
         const sorted = [...bookings].sort((a, b) => 
-            new Date(b.createdAt) - new Date(a.createdAt)
+            new Date(b.createdAt || b.updatedAt) - new Date(a.createdAt || a.updatedAt)
         );
 
         tbody.innerHTML = sorted.map(function(b) {
+            // Tampilkan tombol aksi sesuai status
+            let actions = '';
+            
+            // Confirm - hanya untuk PENDING
+            if (b.status === 'PENDING') {
+                actions += `<button class="btn btn-green btn-sm" data-action="confirm" data-id="${b.bookingId}">Confirm</button>`;
+            }
+            
+            // Reschedule - untuk semua kecuali COMPLETED, CANCELLED, REJECTED
+            if (!['COMPLETED', 'CANCELLED', 'REJECTED'].includes(b.status)) {
+                actions += `<button class="btn btn-blue btn-sm" data-action="reschedule" data-id="${b.bookingId}">Reschedule</button>`;
+            }
+            
+            // Cancel - untuk semua kecuali CANCELLED, REJECTED, COMPLETED
+            if (!['CANCELLED', 'REJECTED', 'COMPLETED'].includes(b.status)) {
+                actions += `<button class="btn btn-outline btn-sm" data-action="cancel" data-id="${b.bookingId}">Cancel</button>`;
+            }
+            
+            // Reject - hanya untuk PENDING
+            if (b.status === 'PENDING') {
+                actions += `<button class="btn btn-red btn-sm" data-action="reject" data-id="${b.bookingId}">Reject</button>`;
+            }
+            
+            // Complete - untuk semua kecuali COMPLETED, CANCELLED, REJECTED
+            if (!['COMPLETED', 'CANCELLED', 'REJECTED'].includes(b.status)) {
+                actions += `<button class="btn btn-outline btn-sm" data-action="complete" data-id="${b.bookingId}">Complete</button>`;
+            }
+            
+            // WA - selalu tampil
+            actions += `<a class="btn btn-amber btn-sm" data-action="wa" data-id="${b.bookingId}" target="_blank" rel="noopener">WA</a>`;
+
             return `<tr>
                 <td><strong>${b.bookingId}</strong></td>
                 <td>${escapeHtml(b.nama)}</td>
@@ -237,17 +193,7 @@ Silakan coba tanggal/jam lain atau hubungi kami untuk informasi lebih lanjut.`;
                 <td>${formatDate(b.updatedAt)}</td>
                 <td>
                     <div class="action-cell">
-                        ${b.status === 'PENDING' ? 
-                            `<button class="btn btn-green btn-sm" data-action="confirm" data-id="${b.bookingId}">Confirm</button>` : ''}
-                        ${b.status !== 'COMPLETED' && b.status !== 'CANCELLED' && b.status !== 'REJECTED' ? 
-                            `<button class="btn btn-blue btn-sm" data-action="reschedule" data-id="${b.bookingId}">Reschedule</button>` : ''}
-                        ${b.status !== 'CANCELLED' && b.status !== 'REJECTED' && b.status !== 'COMPLETED' ? 
-                            `<button class="btn btn-outline btn-sm" data-action="cancel" data-id="${b.bookingId}">Cancel</button>` : ''}
-                        ${b.status === 'PENDING' ? 
-                            `<button class="btn btn-red btn-sm" data-action="reject" data-id="${b.bookingId}">Reject</button>` : ''}
-                        ${b.status !== 'COMPLETED' && b.status !== 'CANCELLED' && b.status !== 'REJECTED' ? 
-                            `<button class="btn btn-outline btn-sm" data-action="complete" data-id="${b.bookingId}">Complete</button>` : ''}
-                        <a class="btn btn-amber btn-sm" data-action="wa" data-id="${b.bookingId}" target="_blank" rel="noopener">WA</a>
+                        ${actions}
                     </div>
                 </td>
             </tr>`;
@@ -263,9 +209,13 @@ Silakan coba tanggal/jam lain atau hubungi kami untuk informasi lebih lanjut.`;
 
     function formatDate(dateStr) {
         if (!dateStr) return '-';
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('id-ID') + ' ' + 
-               d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        try {
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('id-ID') + ' ' + 
+                   d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        } catch {
+            return dateStr;
+        }
     }
 
     // ========== ACTIONS ==========
@@ -284,14 +234,14 @@ Silakan coba tanggal/jam lain atau hubungi kami untuk informasi lebih lanjut.`;
 
         if (action === 'confirm') {
             if (!confirm('Konfirmasi booking ' + bookingId + '?')) return;
-            updateStatus(bookingId, 'CONFIRMED');
+            handleAction(() => API.confirmBooking(bookingId, token), 'Booking dikonfirmasi.');
         } else if (action === 'cancel') {
             openReasonModal(bookingId, 'cancel');
         } else if (action === 'reject') {
             openReasonModal(bookingId, 'reject');
         } else if (action === 'complete') {
             if (!confirm('Tandai booking ' + bookingId + ' sebagai selesai?')) return;
-            updateStatus(bookingId, 'COMPLETED');
+            handleAction(() => API.completeBooking(bookingId, token), 'Booking ditandai selesai.');
         } else if (action === 'reschedule') {
             openRescheduleModal(bookingId);
         } else if (action === 'wa') {
@@ -300,45 +250,51 @@ Silakan coba tanggal/jam lain atau hubungi kami untuk informasi lebih lanjut.`;
         }
     });
 
-    // ========== UPDATE STATUS ==========
-    function updateStatus(bookingId, status, alasan = '') {
-        const bookings = getBookings();
-        const index = bookings.findIndex(b => b.bookingId === bookingId);
-        
-        if (index === -1) {
-            toast('Booking tidak ditemukan', 'error');
-            return;
+    // ========== HANDLE ACTION ==========
+    async function handleAction(actionFn, successMsg) {
+        try {
+            const res = await actionFn();
+            
+            if (!res.success) {
+                toast(res.message || 'Aksi gagal.', 'error');
+                return;
+            }
+            
+            toast(successMsg, 'success');
+            lastRenderHash = ''; // Force re-render
+            refreshAll();
+            
+        } catch (error) {
+            console.error('Action error:', error);
+            toast('Terjadi kesalahan, silakan coba lagi', 'error');
         }
-
-        bookings[index].status = status;
-        if (alasan) bookings[index].alasan = alasan;
-        bookings[index].updatedAt = new Date().toISOString();
-        
-        saveBookings(bookings);
-        lastRenderHash = ''; // Force re-render
-        toast(`Status berhasil diupdate menjadi ${status}`, 'success');
-        refreshAll();
     }
 
     // ========== SEND WHATSAPP ==========
     function sendWhatsApp(booking) {
         const template = WA_TEMPLATES[booking.status] || WA_TEMPLATES['new'];
         const message = template(booking);
-        const waNumber = CONFIG.WHATSAPP_ADMIN_NUMBER;
-        window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`, '_blank');
+        const waNumber = CONFIG.WHATSAPP_ADMIN_NUMBER || '6281234567890';
+        window.open(waLink(waNumber, message), '_blank');
     }
 
     // ========== MODAL: RESCHEDULE ==========
-    const rescheduleModal = document.getElementById('reschedule-modal');
-    const rsBookingId = document.getElementById('rs-booking-id');
-    const rsTanggal = document.getElementById('rs-tanggal');
-    const rsJam = document.getElementById('rs-jam');
+    function openRescheduleModal(bookingId) {
+        actionTargetId = bookingId;
+        rsBookingId.textContent = bookingId;
+        rsTanggal.value = '';
+        rsJam.value = '';
+        // Set min date to today
+        const today = new Date();
+        rsTanggal.min = today.toISOString().split('T')[0];
+        rescheduleModal.classList.add('open');
+    }
 
-    document.getElementById('rs-cancel-btn').addEventListener('click', function() {
+    rsCancelBtn.addEventListener('click', function() {
         rescheduleModal.classList.remove('open');
     });
 
-    document.getElementById('rs-submit-btn').addEventListener('click', function() {
+    rsSubmitBtn.addEventListener('click', async function() {
         const tanggalBaru = rsTanggal.value;
         const jamBaru = rsJam.value;
         
@@ -347,58 +303,26 @@ Silakan coba tanggal/jam lain atau hubungi kami untuk informasi lebih lanjut.`;
             return;
         }
 
-        const bookings = getBookings();
-        const index = bookings.findIndex(b => b.bookingId === actionTargetId);
-        
-        if (index === -1) {
-            toast('Booking tidak ditemukan', 'error');
-            return;
+        try {
+            const res = await API.rescheduleBooking(actionTargetId, tanggalBaru, jamBaru, token);
+            rescheduleModal.classList.remove('open');
+            
+            if (!res.success) {
+                toast(res.message || 'Gagal reschedule.', 'error');
+                return;
+            }
+            
+            toast('Booking dijadwalkan ulang.', 'success');
+            lastRenderHash = '';
+            refreshAll();
+            
+        } catch (error) {
+            console.error('Reschedule error:', error);
+            toast('Terjadi kesalahan, silakan coba lagi', 'error');
         }
-
-        bookings[index].tanggal = tanggalBaru;
-        bookings[index].jam = jamBaru;
-        bookings[index].status = 'RESCHEDULED';
-        bookings[index].updatedAt = new Date().toISOString();
-        
-        saveBookings(bookings);
-        rescheduleModal.classList.remove('open');
-        lastRenderHash = '';
-        toast('Booking berhasil direschedule!', 'success');
-        refreshAll();
     });
 
-    function openRescheduleModal(bookingId) {
-        actionTargetId = bookingId;
-        rsBookingId.textContent = bookingId;
-        rsTanggal.value = '';
-        rsJam.value = '';
-        rescheduleModal.classList.add('open');
-    }
-
-    // ========== MODAL: REASON (cancel/reject) ==========
-    const reasonModal = document.getElementById('reason-modal');
-    const reasonTitle = document.getElementById('reason-title');
-    const rnBookingId = document.getElementById('rn-booking-id');
-    const rnAlasan = document.getElementById('rn-alasan');
-    let reasonMode = 'cancel';
-
-    document.getElementById('rn-cancel-btn').addEventListener('click', function() {
-        reasonModal.classList.remove('open');
-    });
-
-    document.getElementById('rn-submit-btn').addEventListener('click', function() {
-        const alasan = rnAlasan.value.trim();
-        
-        if (!alasan) {
-            toast('Alasan wajib diisi.', 'error');
-            return;
-        }
-
-        const status = reasonMode === 'cancel' ? 'CANCELLED' : 'REJECTED';
-        updateStatus(actionTargetId, status, alasan);
-        reasonModal.classList.remove('open');
-    });
-
+    // ========== MODAL: REASON ==========
     function openReasonModal(bookingId, mode) {
         actionTargetId = bookingId;
         reasonMode = mode;
@@ -408,14 +332,81 @@ Silakan coba tanggal/jam lain atau hubungi kami untuk informasi lebih lanjut.`;
         reasonModal.classList.add('open');
     }
 
+    rnCancelBtn.addEventListener('click', function() {
+        reasonModal.classList.remove('open');
+    });
+
+    rnSubmitBtn.addEventListener('click', async function() {
+        const alasan = rnAlasan.value.trim();
+        
+        if (!alasan) {
+            toast('Alasan wajib diisi.', 'error');
+            return;
+        }
+
+        try {
+            const actionFn = reasonMode === 'cancel' 
+                ? () => API.cancelBooking(actionTargetId, alasan, token)
+                : () => API.rejectBooking(actionTargetId, alasan, token);
+            
+            const res = await actionFn();
+            reasonModal.classList.remove('open');
+            
+            if (!res.success) {
+                toast(res.message || 'Aksi gagal.', 'error');
+                return;
+            }
+            
+            toast(reasonMode === 'cancel' ? 'Booking dibatalkan.' : 'Booking ditolak.', 'success');
+            lastRenderHash = '';
+            refreshAll();
+            
+        } catch (error) {
+            console.error('Reason action error:', error);
+            toast('Terjadi kesalahan, silakan coba lagi', 'error');
+        }
+    });
+
+    // ========== CONNECTION INDICATOR ==========
+    document.addEventListener('connection-change', function(e) {
+        if (!connIndicator) return;
+        if (e.detail.online) {
+            connIndicator.textContent = '● LIVE';
+            connIndicator.className = 'conn-indicator online';
+        } else {
+            connIndicator.textContent = '⚠ OFFLINE (Fallback)';
+            connIndicator.className = 'conn-indicator offline';
+        }
+    });
+
+    // ========== KEYBOARD SHORTCUTS ==========
+    document.addEventListener('keydown', function(e) {
+        // ESC to close modals
+        if (e.key === 'Escape') {
+            if (rescheduleModal.classList.contains('open')) {
+                rescheduleModal.classList.remove('open');
+            }
+            if (reasonModal.classList.contains('open')) {
+                reasonModal.classList.remove('open');
+            }
+        }
+    });
+
     // ========== INIT ==========
-    if (token) {
-        // Verify token is valid (simple check)
-        enterDashboard();
+    function init() {
+        console.log('✅ Admin.js loaded successfully!');
+        
+        // Auto login if token exists
+        if (token) {
+            enterDashboard();
+        }
     }
 
-    console.log('✅ Admin.js loaded successfully!');
-    console.log('🔑 Password admin: admin123');
-    console.log('📊 Using Local Storage key:', CONFIG.STORAGE_KEY);
+    // ========== START ==========
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 
 })();
