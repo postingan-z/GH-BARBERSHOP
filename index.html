@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin - Booking</title>
+<title>Booking Online</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
@@ -21,38 +21,8 @@ body {
   min-height: 100vh;
 }
 
-/* LOGIN WRAP */
-.login-wrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 20px;
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-}
-
-.login-card {
-  max-width: 400px;
-  width: 100%;
-  background: #fff;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-}
-.login-card h2 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin-bottom: 4px;
-}
-.login-card .subtitle {
-  color: #6b7280;
-  font-size: 0.9rem;
-  margin-bottom: 24px;
-}
-
-/* PAGE WIDE */
-.page-wide {
-  max-width: 1400px;
+.page {
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px 16px;
 }
@@ -61,14 +31,13 @@ body {
 .topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   background: #1f2937;
   color: #fff;
   padding: 12px 20px;
   border-radius: 12px;
   margin-bottom: 24px;
+  gap: 16px;
   flex-wrap: wrap;
-  gap: 12px;
 }
 
 .brand {
@@ -78,9 +47,38 @@ body {
 .brand span {
   color: #f59e0b;
 }
-.brand a {
-  color: inherit;
+
+.navbar {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 6px;
+}
+
+.nav-links li a {
+  color: rgba(255,255,255,0.7);
   text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.nav-links li a:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+}
+
+.nav-links li a.active {
+  color: #fff;
+  background: rgba(255,255,255,0.15);
 }
 
 .conn-indicator {
@@ -88,49 +86,33 @@ body {
   font-weight: 700;
   padding: 4px 12px;
   border-radius: 20px;
+  letter-spacing: 0.5px;
 }
-.conn-indicator.online { color: #22c55e; }
-.conn-indicator.offline { color: #ef4444; }
+.conn-indicator.online {
+  color: #22c55e;
+}
+.conn-indicator.offline {
+  color: #ef4444;
+}
 
-/* BUTTONS */
-.btn {
-  display: inline-block;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.8rem;
-  cursor: pointer;
-  text-decoration: none;
-  text-align: center;
-  transition: all 0.2s;
-  font-family: inherit;
+/* CARD */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
 }
-.btn-primary {
-  background: #2563eb;
-  color: #fff;
-  width: 100%;
-  padding: 12px;
-  font-size: 0.95rem;
+.card h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 4px;
 }
-.btn-primary:hover { background: #1d4ed8; }
-.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-
-.btn-sm { padding: 4px 10px; font-size: 0.7rem; }
-.btn-green { background: #22c55e; color: #fff; }
-.btn-green:hover { background: #16a34a; }
-.btn-blue { background: #3b82f6; color: #fff; }
-.btn-blue:hover { background: #2563eb; }
-.btn-red { background: #ef4444; color: #fff; }
-.btn-red:hover { background: #dc2626; }
-.btn-amber { background: #f59e0b; color: #fff; }
-.btn-amber:hover { background: #d97706; }
-.btn-outline {
-  background: transparent;
-  color: #374151;
-  border: 2px solid #d1d5db;
+.card .subtitle {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
 }
-.btn-outline:hover { background: #f3f4f6; }
 
 /* FIELD */
 .field {
@@ -144,6 +126,7 @@ body {
   color: #374151;
 }
 .field input,
+.field select,
 .field textarea {
   width: 100%;
   padding: 10px 14px;
@@ -155,6 +138,7 @@ body {
   background: #fff;
 }
 .field input:focus,
+.field select:focus,
 .field textarea:focus {
   outline: none;
   border-color: #2563eb;
@@ -164,140 +148,168 @@ body {
   resize: vertical;
 }
 
-/* CARD */
-.card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-}
-.card h2 {
-  font-size: 1.3rem;
-  font-weight: 800;
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
-/* STAT GRID */
-.stat-grid {
+/* SLOT GRID */
+.slot-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 12px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
 }
-.stat-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 16px;
+
+.slot-item {
+  padding: 10px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
   text-align: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fff;
 }
-.stat-card .num {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: #1f2937;
+
+.slot-item.available:hover {
+  border-color: #6b7280;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-.stat-card .lbl {
+
+.slot-item.selected {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.slot-item.unavailable {
+  background: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.slot-time {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.slot-info {
+  display: block;
   font-size: 0.7rem;
   color: #6b7280;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  margin-top: 2px;
 }
 
-/* TABLE */
-.table-wrap {
-  overflow-x: auto;
-  padding: 0 0 4px 0;
+.slot-badge {
+  display: inline-block;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.6rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-top: 4px;
 }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-}
-thead {
-  background: #f9fafb;
-}
-th {
-  text-align: left;
-  padding: 12px 10px;
-  font-weight: 700;
-  color: #374151;
-  border-bottom: 2px solid #e5e7eb;
-  white-space: nowrap;
-}
-td {
-  padding: 10px;
-  border-bottom: 1px solid #f3f4f6;
-  vertical-align: middle;
-}
-tr:hover td {
-  background: #f9fafb;
-}
+
 .loading-row {
+  grid-column: 1 / -1;
   text-align: center;
+  padding: 20px;
   color: #6b7280;
-  padding: 30px !important;
+}
+.loading-row.error {
+  color: #ef4444;
+}
+
+/* BUTTON */
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+  width: 100%;
+}
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.btn-amber {
+  background: #f59e0b;
+  color: #fff;
+}
+.btn-amber:hover {
+  background: #d97706;
+}
+.btn-outline {
+  background: transparent;
+  color: #374151;
+  border: 2px solid #d1d5db;
+}
+.btn-outline:hover {
+  background: #f3f4f6;
+}
+
+/* DETAIL ROW */
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+.detail-row .label {
+  color: #6b7280;
+  font-weight: 500;
+}
+.detail-row .value {
+  font-weight: 700;
 }
 
 .badge {
   display: inline-block;
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: 12px;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 700;
 }
-.badge-PENDING { background: #fef3c7; color: #d97706; }
-.badge-CONFIRMED { background: #dbeafe; color: #2563eb; }
-.badge-COMPLETED { background: #d1fae5; color: #059669; }
-.badge-CANCELLED { background: #f3f4f6; color: #6b7280; }
-.badge-REJECTED { background: #fee2e2; color: #dc2626; }
-.badge-RESCHEDULED { background: #ede9fe; color: #7c3aed; }
-
-.action-cell {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+.badge-PENDING {
+  background: #fef3c7;
+  color: #d97706;
 }
-.action-cell .btn {
-  font-size: 0.65rem;
-  padding: 3px 8px;
-  white-space: nowrap;
+.badge-CONFIRMED {
+  background: #dbeafe;
+  color: #2563eb;
 }
-
-/* MODAL */
-.modal-backdrop {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  padding: 20px;
+.badge-COMPLETED {
+  background: #d1fae5;
+  color: #059669;
 }
-.modal-backdrop.open {
-  display: flex;
-}
-.modal-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 28px;
-  max-width: 450px;
-  width: 100%;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-}
-.modal-card h2 {
-  font-size: 1.2rem;
-  font-weight: 800;
-  margin-bottom: 4px;
-}
-.modal-card .subtitle {
+.badge-CANCELLED {
+  background: #f3f4f6;
   color: #6b7280;
-  font-size: 0.9rem;
-  margin-bottom: 16px;
 }
-.modal-card .field {
-  margin-bottom: 14px;
+.badge-REJECTED {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.badge-RESCHEDULED {
+  background: #ede9fe;
+  color: #7c3aed;
 }
 
 /* TOAST */
@@ -331,108 +343,122 @@ tr:hover td {
 }
 
 /* RESPONSIVE */
-@media (max-width: 768px) {
-  .stat-grid {
-    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+@media (max-width: 640px) {
+  .topbar {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    gap: 8px;
   }
-  .stat-card .num { font-size: 1.2rem; }
-  .table-wrap { font-size: 0.75rem; }
-  th, td { padding: 6px 6px; }
-  .action-cell .btn { font-size: 0.6rem; padding: 2px 6px; }
-  .modal-card { padding: 20px; }
+  .navbar {
+    order: 3;
+    width: 100%;
+    margin: 0;
+    justify-content: center;
+  }
+  .nav-links li a {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+  }
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+  .slot-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+  .card {
+    padding: 16px;
+  }
+  .toast {
+    min-width: 200px;
+    font-size: 0.8rem;
+    padding: 12px 16px;
+  }
 }
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="login-wrap" id="login-wrap">
-  <div class="card login-card">
-    <h2>Admin Login</h2>
-    <p class="subtitle">Masukkan password admin untuk mengakses dashboard.</p>
-    <form id="login-form">
+<div class="page">
+  <!-- TOPBAR / NAVBAR -->
+  <div class="topbar">
+    <div class="brand">Booking<span>.</span></div>
+    <nav class="navbar">
+      <ul class="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="status.html">Cek Status</a></li>
+        <li><a href="admin.html">Admin</a></li>
+      </ul>
+    </nav>
+    <div id="conn-indicator" class="conn-indicator online">● LIVE</div>
+  </div>
+
+  <!-- FORM BOOKING -->
+  <div class="card" id="form-card">
+    <h2>Buat Booking</h2>
+    <p class="subtitle">Isi data di bawah, sistem akan mengecek ketersediaan slot secara real-time.</p>
+
+    <form id="booking-form">
       <div class="field">
-        <label>Password</label>
-        <input type="password" name="password" required placeholder="••••••••">
+        <label>Nama Lengkap</label>
+        <input type="text" name="nama" required placeholder="Nama Anda">
       </div>
-      <button type="submit" class="btn btn-primary" id="login-btn">Masuk</button>
+      <div class="field">
+        <label>Nomor WhatsApp</label>
+        <input type="tel" name="whatsapp" required placeholder="08123456789">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Tanggal</label>
+          <input type="date" name="tanggal" id="input-tanggal" required>
+        </div>
+        <div class="field">
+          <label>Jumlah Orang</label>
+          <input type="number" name="jumlah" min="1" value="1" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>Jenis Layanan</label>
+        <select name="layanan" id="select-layanan" required>
+          <option value="">Pilih Layanan</option>
+          <option value="Potong Rambut">Potong Rambut</option>
+          <option value="Creambath">Creambath</option>
+          <option value="Cat Rambut">Cat Rambut</option>
+          <option value="Smoothing">Smoothing</option>
+          <option value="Hair Treatment">Hair Treatment</option>
+          <option value="Full Package">Full Package</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Pilih Jam</label>
+        <div id="slot-grid" class="slot-grid">
+          <div class="loading-row">Pilih tanggal untuk melihat jam tersedia</div>
+        </div>
+        <input type="hidden" name="jam" id="input-jam" required>
+      </div>
+
+      <div class="field">
+        <label>Catatan (opsional)</label>
+        <textarea name="catatan" placeholder="Tulis catatan tambahan..."></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="submit-btn">Buat Booking</button>
     </form>
   </div>
-</div>
 
-<!-- DASHBOARD -->
-<div class="page-wide" id="dashboard-wrap" style="display:none;">
-  <div class="topbar">
-    <div class="brand"><a href="index.html">Admin Dashboard<span>.</span></a></div>
-    <div style="display:flex; align-items:center; gap:10px;">
-      <div id="conn-indicator" class="conn-indicator online">● LIVE</div>
-      <button class="btn btn-outline btn-sm" id="logout-btn">Keluar</button>
-    </div>
-  </div>
+  <!-- HASIL BOOKING -->
+  <div class="card" id="result-card" style="display:none;">
+    <h2>Booking Berhasil Dibuat</h2>
+    <div class="detail-row"><span class="label">Booking ID</span><span class="value" id="res-id">-</span></div>
+    <div class="detail-row"><span class="label">Nama</span><span class="value" id="res-nama">-</span></div>
+    <div class="detail-row"><span class="label">Tanggal</span><span class="value" id="res-tanggal">-</span></div>
+    <div class="detail-row"><span class="label">Jam</span><span class="value" id="res-jam">-</span></div>
+    <div class="detail-row"><span class="label">Status</span><span class="value"><span class="badge badge-PENDING">PENDING</span></span></div>
 
-  <div class="stat-grid" id="stat-grid">
-    <div class="stat-card"><div class="num" id="s-total">0</div><div class="lbl">Total</div></div>
-    <div class="stat-card"><div class="num" id="s-PENDING">0</div><div class="lbl">Pending</div></div>
-    <div class="stat-card"><div class="num" id="s-CONFIRMED">0</div><div class="lbl">Confirmed</div></div>
-    <div class="stat-card"><div class="num" id="s-RESCHEDULED">0</div><div class="lbl">Rescheduled</div></div>
-    <div class="stat-card"><div class="num" id="s-CANCELLED">0</div><div class="lbl">Cancelled</div></div>
-    <div class="stat-card"><div class="num" id="s-REJECTED">0</div><div class="lbl">Rejected</div></div>
-    <div class="stat-card"><div class="num" id="s-COMPLETED">0</div><div class="lbl">Completed</div></div>
-  </div>
-
-  <div class="card" style="padding:0; overflow:hidden;">
-    <div style="padding:18px 18px 4px; display:flex; justify-content:space-between; align-items:center;">
-      <h2>Semua Booking</h2>
-      <span style="font-size:0.8rem; color:#6b7280;" id="booking-count">0 booking</span>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Booking ID</th><th>Nama</th><th>WhatsApp</th><th>Tanggal</th><th>Jam</th>
-            <th>Jumlah</th><th>Layanan</th><th>Status</th><th>Diperbarui</th><th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody id="booking-tbody">
-          <tr><td colspan="10" class="loading-row">Memuat data...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: RESCHEDULE -->
-<div class="modal-backdrop" id="reschedule-modal">
-  <div class="modal-card">
-    <h2>Reschedule Booking</h2>
-    <p class="subtitle">Booking ID: <b id="rs-booking-id">-</b></p>
-    <div class="field">
-      <label>Tanggal Baru</label>
-      <input type="date" id="rs-tanggal">
-    </div>
-    <div class="field">
-      <label>Jam Baru</label>
-      <input type="time" id="rs-jam">
-    </div>
-    <div style="display:flex; gap:10px;">
-      <button class="btn btn-outline" id="rs-cancel-btn" type="button">Batal</button>
-      <button class="btn btn-primary" id="rs-submit-btn" type="button">Simpan</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: ALASAN (cancel/reject) -->
-<div class="modal-backdrop" id="reason-modal">
-  <div class="modal-card">
-    <h2 id="reason-title">Alasan</h2>
-    <p class="subtitle">Booking ID: <b id="rn-booking-id">-</b></p>
-    <div class="field">
-      <label>Alasan</label>
-      <textarea id="rn-alasan" placeholder="Tulis alasan..."></textarea>
-    </div>
-    <div style="display:flex; gap:10px;">
-      <button class="btn btn-outline" id="rn-cancel-btn" type="button">Batal</button>
-      <button class="btn btn-red" id="rn-submit-btn" type="button">Konfirmasi</button>
+    <div style="margin-top:18px; display:flex; flex-direction:column; gap:10px;">
+      <a class="btn btn-amber" id="res-wa-btn" target="_blank" rel="noopener">Kirim WhatsApp</a>
+      <a class="btn btn-outline" href="status.html" id="res-status-link">Cek Status Booking</a>
+      <button class="btn btn-outline" id="res-new-btn" type="button">Buat Booking Lain</button>
     </div>
   </div>
 </div>
@@ -441,7 +467,7 @@ tr:hover td {
 
 <script>
 // ========================================
-// ADMIN.JS - Semua logika di satu file
+// ALL JAVASCRIPT LOGIC - TANPA LOGIN
 // ========================================
 
 (function() {
@@ -449,11 +475,33 @@ tr:hover td {
 
   // ========== CONFIGURATION ==========
   const CONFIG = {
-    ADMIN_PASSWORD: 'admin123',
-    STORAGE_KEY: 'bookings_data',
     WHATSAPP_ADMIN_NUMBER: '6281234567890',
-    POLLING_INTERVAL_MS: 3000
+    OPERATIONAL_HOURS: { start: '08:00', end: '21:00' },
+    SLOT_DURATION: 60,
+    MAX_CAPACITY: 10,
+    STORAGE_KEY: 'bookings_data'
   };
+
+  // ========== DOM REFS ==========
+  const form = document.getElementById('booking-form');
+  const formCard = document.getElementById('form-card');
+  const resultCard = document.getElementById('result-card');
+  const submitBtn = document.getElementById('submit-btn');
+  const slotGrid = document.getElementById('slot-grid');
+  const inputJam = document.getElementById('input-jam');
+  const inputTanggal = document.getElementById('input-tanggal');
+  const selectLayanan = document.getElementById('select-layanan');
+  const connIndicator = document.getElementById('conn-indicator');
+
+  const resId = document.getElementById('res-id');
+  const resNama = document.getElementById('res-nama');
+  const resTanggal = document.getElementById('res-tanggal');
+  const resJam = document.getElementById('res-jam');
+  const resWaBtn = document.getElementById('res-wa-btn');
+  const resNewBtn = document.getElementById('res-new-btn');
+
+  let selectedJam = null;
+  let currentBooking = null;
 
   // ========== LOCAL STORAGE ==========
   function getBookings() {
@@ -465,6 +513,27 @@ tr:hover td {
 
   function saveBookings(bookings) {
     localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(bookings));
+  }
+
+  function generateId() {
+    return 'BK' + Date.now().toString(36).toUpperCase() + 
+           Math.random().toString(36).substring(2, 5).toUpperCase();
+  }
+
+  function generateTimeSlots() {
+    const slots = [];
+    const start = CONFIG.OPERATIONAL_HOURS.start;
+    const end = CONFIG.OPERATIONAL_HOURS.end;
+    const duration = CONFIG.SLOT_DURATION;
+    
+    let current = new Date(`2000-01-01 ${start}`);
+    const endTime = new Date(`2000-01-01 ${end}`);
+    
+    while (current < endTime) {
+      slots.push(current.toTimeString().slice(0, 5));
+      current.setMinutes(current.getMinutes() + duration);
+    }
+    return slots;
   }
 
   // ========== TOAST ==========
@@ -481,344 +550,226 @@ tr:hover td {
     }, 3000);
   }
 
-  // ========== DOM REFS ==========
-  const loginWrap = document.getElementById('login-wrap');
-  const dashboardWrap = document.getElementById('dashboard-wrap');
-  const loginForm = document.getElementById('login-form');
-  const loginBtn = document.getElementById('login-btn');
-  const logoutBtn = document.getElementById('logout-btn');
-  const tbody = document.getElementById('booking-tbody');
-  const bookingCount = document.getElementById('booking-count');
-  const connIndicator = document.getElementById('conn-indicator');
+  // ========== CONNECTION STATUS ==========
+  function updateConnectionStatus(online) {
+    connIndicator.className = `conn-indicator ${online ? 'online' : 'offline'}`;
+    connIndicator.textContent = online ? '● LIVE' : '● OFFLINE';
+  }
+  updateConnectionStatus(true);
 
-  // Modal elements
-  const rescheduleModal = document.getElementById('reschedule-modal');
-  const rsBookingId = document.getElementById('rs-booking-id');
-  const rsTanggal = document.getElementById('rs-tanggal');
-  const rsJam = document.getElementById('rs-jam');
-  const rsCancelBtn = document.getElementById('rs-cancel-btn');
-  const rsSubmitBtn = document.getElementById('rs-submit-btn');
+  // ========== LOAD SLOTS ==========
+  function loadSlots() {
+    const tanggal = inputTanggal.value;
+    const layanan = selectLayanan.value;
 
-  const reasonModal = document.getElementById('reason-modal');
-  const reasonTitle = document.getElementById('reason-title');
-  const rnBookingId = document.getElementById('rn-booking-id');
-  const rnAlasan = document.getElementById('rn-alasan');
-  const rnCancelBtn = document.getElementById('rn-cancel-btn');
-  const rnSubmitBtn = document.getElementById('rn-submit-btn');
+    if (!tanggal || !layanan) {
+      slotGrid.innerHTML = '<div class="loading-row">Pilih tanggal dan layanan untuk melihat jam tersedia</div>';
+      return;
+    }
 
-  // ========== STATE ==========
-  let pollHandle = null;
-  let currentBookings = [];
-  let lastRenderHash = '';
-  let actionTargetId = null;
-  let reasonMode = 'cancel';
+    slotGrid.innerHTML = '<div class="loading-row">Memuat jam tersedia...</div>';
 
-  // ========== LOGIN ==========
-  loginForm.addEventListener('submit', function(e) {
+    // Simulasi loading
+    setTimeout(() => {
+      const bookings = getBookings();
+      const allSlots = generateTimeSlots();
+      
+      const existingBookings = bookings.filter(b => 
+        b.tanggal === tanggal && 
+        b.layanan === layanan &&
+        (b.status === 'PENDING' || b.status === 'CONFIRMED' || b.status === 'RESCHEDULED')
+      );
+
+      const availableSlots = allSlots.map(slot => {
+        const count = existingBookings.filter(b => b.jam === slot).length;
+        return {
+          time: slot,
+          available: count < CONFIG.MAX_CAPACITY,
+          booked: count,
+          max: CONFIG.MAX_CAPACITY
+        };
+      });
+
+      renderSlots(availableSlots);
+    }, 300);
+  }
+
+  function renderSlots(slots) {
+    if (!slots || slots.length === 0) {
+      slotGrid.innerHTML = '<div class="loading-row">Tidak ada jam tersedia</div>';
+      return;
+    }
+
+    let html = '';
+    let hasAvailable = false;
+
+    slots.forEach(slot => {
+      const isAvailable = slot.available !== false;
+      const isSelected = selectedJam === slot.time;
+      if (isAvailable) hasAvailable = true;
+
+      html += `
+        <div class="slot-item ${isAvailable ? 'available' : 'unavailable'} ${isSelected ? 'selected' : ''}"
+             data-time="${slot.time}"
+             data-available="${isAvailable}"
+             ${!isAvailable ? 'style="cursor:not-allowed;opacity:0.5;"' : ''}>
+          <span class="slot-time">${slot.time}</span>
+          ${slot.booked !== undefined ? `<span class="slot-info">${slot.booked}/${slot.max}</span>` : ''}
+          ${isAvailable ? '' : '<span class="slot-badge">Full</span>'}
+        </div>
+      `;
+    });
+
+    slotGrid.innerHTML = html;
+
+    if (!hasAvailable) {
+      slotGrid.innerHTML = '<div class="loading-row">Maaf, semua jam sudah penuh</div>';
+      return;
+    }
+
+    document.querySelectorAll('.slot-item.available').forEach(el => {
+      el.addEventListener('click', function() {
+        document.querySelectorAll('.slot-item.selected').forEach(e => e.classList.remove('selected'));
+        this.classList.add('selected');
+        selectedJam = this.dataset.time;
+        inputJam.value = selectedJam;
+      });
+    });
+
+    if (!selectedJam || !document.querySelector(`.slot-item[data-time="${selectedJam}"]`)) {
+      selectedJam = null;
+      inputJam.value = '';
+    }
+  }
+
+  // ========== EVENT HANDLERS ==========
+  inputTanggal.addEventListener('change', function() {
+    selectedJam = null;
+    inputJam.value = '';
+    loadSlots();
+  });
+
+  selectLayanan.addEventListener('change', function() {
+    selectedJam = null;
+    inputJam.value = '';
+    loadSlots();
+  });
+
+  // ========== SUBMIT ==========
+  form.addEventListener('submit', function(e) {
     e.preventDefault();
-    const password = new FormData(e.target).get('password');
 
-    if (password === CONFIG.ADMIN_PASSWORD) {
-      loginWrap.style.display = 'none';
-      dashboardWrap.style.display = 'block';
-      toast('Login berhasil!', 'success');
-      refreshDashboard();
-      
-      // Start polling
-      if (pollHandle) clearInterval(pollHandle);
-      pollHandle = setInterval(refreshDashboard, CONFIG.POLLING_INTERVAL_MS);
-    } else {
-      toast('Password salah!', 'error');
-    }
-  });
+    const formData = new FormData(form);
+    const nama = formData.get('nama').trim();
+    const whatsapp = formData.get('whatsapp').trim();
+    const tanggal = formData.get('tanggal');
+    const jumlah = parseInt(formData.get('jumlah'));
+    const layanan = formData.get('layanan');
+    const catatan = formData.get('catatan').trim() || '-';
 
-  // ========== LOGOUT ==========
-  logoutBtn.addEventListener('click', function() {
-    if (pollHandle) {
-      clearInterval(pollHandle);
-      pollHandle = null;
-    }
-    loginWrap.style.display = 'flex';
-    dashboardWrap.style.display = 'none';
-    toast('Logout berhasil', 'info');
-  });
-
-  // ========== REFRESH DASHBOARD ==========
-  function refreshDashboard() {
-    const bookings = getBookings();
-    currentBookings = bookings;
-    renderStats(bookings);
-    renderTable(bookings);
-    
-    // Update connection status
-    connIndicator.className = 'conn-indicator online';
-    connIndicator.textContent = '● LIVE';
-  }
-
-  function renderStats(bookings) {
-    const stats = {
-      total: bookings.length,
-      PENDING: 0,
-      CONFIRMED: 0,
-      RESCHEDULED: 0,
-      CANCELLED: 0,
-      REJECTED: 0,
-      COMPLETED: 0
-    };
-    bookings.forEach(b => {
-      if (stats[b.status] !== undefined) stats[b.status]++;
-    });
-
-    ['total', 'PENDING', 'CONFIRMED', 'RESCHEDULED', 'CANCELLED', 'REJECTED', 'COMPLETED'].forEach(k => {
-      const el = document.getElementById('s-' + k);
-      if (el) el.textContent = stats[k] || 0;
-    });
-
-    if (bookingCount) {
-      bookingCount.textContent = `${bookings.length} booking`;
-    }
-  }
-
-  function renderTable(bookings) {
-    // Only redraw if data changed
-    const hash = JSON.stringify(bookings.map(b => [b.bookingId, b.status, b.updatedAt]));
-    if (hash === lastRenderHash) return;
-    lastRenderHash = hash;
-
-    if (!bookings || bookings.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="10" class="loading-row">Belum ada booking.</td></tr>';
+    if (!selectedJam) {
+      toast('Silakan pilih jam terlebih dahulu', 'error');
       return;
     }
 
-    // Sort by newest first
-    const sorted = [...bookings].sort((a, b) => 
-      new Date(b.createdAt || b.updatedAt) - new Date(a.createdAt || a.updatedAt)
-    );
-
-    tbody.innerHTML = sorted.map(function(b) {
-      let actions = '';
-      
-      // Confirm - hanya untuk PENDING
-      if (b.status === 'PENDING') {
-        actions += `<button class="btn btn-green btn-sm" data-action="confirm" data-id="${b.bookingId}">Confirm</button>`;
-      }
-      
-      // Reschedule - untuk semua kecuali COMPLETED, CANCELLED, REJECTED
-      if (!['COMPLETED', 'CANCELLED', 'REJECTED'].includes(b.status)) {
-        actions += `<button class="btn btn-blue btn-sm" data-action="reschedule" data-id="${b.bookingId}">Reschedule</button>`;
-      }
-      
-      // Cancel - untuk semua kecuali CANCELLED, REJECTED, COMPLETED
-      if (!['CANCELLED', 'REJECTED', 'COMPLETED'].includes(b.status)) {
-        actions += `<button class="btn btn-outline btn-sm" data-action="cancel" data-id="${b.bookingId}">Cancel</button>`;
-      }
-      
-      // Reject - hanya untuk PENDING
-      if (b.status === 'PENDING') {
-        actions += `<button class="btn btn-red btn-sm" data-action="reject" data-id="${b.bookingId}">Reject</button>`;
-      }
-      
-      // Complete - untuk semua kecuali COMPLETED, CANCELLED, REJECTED
-      if (!['COMPLETED', 'CANCELLED', 'REJECTED'].includes(b.status)) {
-        actions += `<button class="btn btn-outline btn-sm" data-action="complete" data-id="${b.bookingId}">Complete</button>`;
-      }
-      
-      // WA - selalu tampil
-      actions += `<a class="btn btn-amber btn-sm" data-action="wa" data-id="${b.bookingId}" target="_blank" rel="noopener">WA</a>`;
-
-      return `<tr>
-        <td><strong>${b.bookingId}</strong></td>
-        <td>${escapeHtml(b.nama)}</td>
-        <td>${escapeHtml(b.whatsapp)}</td>
-        <td>${b.tanggal}</td>
-        <td>${b.jam}</td>
-        <td>${b.jumlah}</td>
-        <td>${escapeHtml(b.layanan)}</td>
-        <td><span class="badge badge-${b.status}">${b.status}</span></td>
-        <td>${formatDate(b.updatedAt)}</td>
-        <td>
-          <div class="action-cell">
-            ${actions}
-          </div>
-        </td>
-      </tr>`;
-    }).join('');
-  }
-
-  function escapeHtml(str) {
-    return String(str ?? '').replace(/[&<>"']/g, function(c) {
-      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
-    });
-  }
-
-  function formatDate(dateStr) {
-    if (!dateStr) return '-';
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('id-ID') + ' ' + 
-             d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-    } catch {
-      return dateStr;
-    }
-  }
-
-  // ========== ACTIONS ==========
-  tbody.addEventListener('click', function(e) {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    
-    const action = btn.dataset.action;
-    const bookingId = btn.dataset.id;
-    const booking = currentBookings.find(b => b.bookingId === bookingId);
-
-    if (!booking) {
-      toast('Booking tidak ditemukan', 'error');
+    if (!/^[0-9]{10,15}$/.test(whatsapp)) {
+      toast('Nomor WhatsApp tidak valid (min 10 digit)', 'error');
       return;
     }
 
-    if (action === 'confirm') {
-      if (!confirm('Konfirmasi booking ' + bookingId + '?')) return;
-      updateStatus(bookingId, 'CONFIRMED');
-    } else if (action === 'cancel') {
-      openReasonModal(bookingId, 'cancel');
-    } else if (action === 'reject') {
-      openReasonModal(bookingId, 'reject');
-    } else if (action === 'complete') {
-      if (!confirm('Tandai booking ' + bookingId + ' sebagai selesai?')) return;
-      updateStatus(bookingId, 'COMPLETED');
-    } else if (action === 'reschedule') {
-      openRescheduleModal(bookingId);
-    } else if (action === 'wa') {
-      e.preventDefault();
-      sendWhatsApp(booking);
-    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Memproses...';
+
+    setTimeout(() => {
+      try {
+        const bookings = getBookings();
+        const newBooking = {
+          bookingId: generateId(),
+          nama,
+          whatsapp,
+          tanggal,
+          jam: selectedJam,
+          jumlah,
+          layanan,
+          catatan,
+          status: 'PENDING',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+
+        bookings.push(newBooking);
+        saveBookings(bookings);
+
+        currentBooking = newBooking;
+        showResult(newBooking);
+        toast('Booking berhasil dibuat!', 'success');
+      } catch (error) {
+        toast('Terjadi kesalahan, silakan coba lagi', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Buat Booking';
+      }
+    }, 500);
   });
 
-  function updateStatus(bookingId, status, alasan = '') {
-    const bookings = getBookings();
-    const index = bookings.findIndex(b => b.bookingId === bookingId);
-    
-    if (index === -1) {
-      toast('Booking tidak ditemukan', 'error');
-      return;
-    }
+  // ========== SHOW RESULT ==========
+  function showResult(booking) {
+    formCard.style.display = 'none';
+    resultCard.style.display = 'block';
 
-    bookings[index].status = status;
-    if (alasan) bookings[index].alasan = alasan;
-    bookings[index].updatedAt = new Date().toISOString();
-    
-    saveBookings(bookings);
-    lastRenderHash = '';
-    toast(`Status berhasil diupdate menjadi ${status}`, 'success');
-    refreshDashboard();
-  }
+    resId.textContent = booking.bookingId;
+    resNama.textContent = booking.nama;
+    resTanggal.textContent = booking.tanggal;
+    resJam.textContent = booking.jam;
 
-  function sendWhatsApp(booking) {
-    const templates = {
-      'PENDING': (b) => `Halo ${b.nama},\n\nBooking Anda masih dalam status PENDING.\n\nBooking ID: ${b.bookingId}\nTanggal: ${b.tanggal}\nJam: ${b.jam}\n\nMohon tunggu konfirmasi dari kami.`,
-      'CONFIRMED': (b) => `Halo ${b.nama},\n\nBooking Anda telah DIKONFIRMASI! ✅\n\nBooking ID: ${b.bookingId}\nTanggal: ${b.tanggal}\nJam: ${b.jam}\n\nSilakan datang tepat waktu. Terima kasih.`,
-      'RESCHEDULED': (b) => `Halo ${b.nama},\n\nBooking Anda DIJADWALKAN ULANG. 🔄\n\nBooking ID: ${b.bookingId}\nTanggal baru: ${b.tanggal}\nJam baru: ${b.jam}\n\nMohon konfirmasi kehadiran Anda.`,
-      'CANCELLED': (b) => `Halo ${b.nama},\n\nBooking Anda telah DIBATALKAN. ❌\n\nBooking ID: ${b.bookingId}\nAlasan: ${b.alasan || '-'}\n\nMohon maaf atas ketidaknyamanannya.`,
-      'REJECTED': (b) => `Halo ${b.nama},\n\nMohon maaf, booking Anda TIDAK DAPAT diproses. ❌\n\nBooking ID: ${b.bookingId}\nAlasan: ${b.alasan || '-'}\n\nSilakan hubungi kami untuk info lebih lanjut.`,
-      'COMPLETED': (b) => `Halo ${b.nama},\n\nTerima kasih telah menggunakan layanan kami. Booking Anda berstatus SELESAI. ✅\n\nBooking ID: ${b.bookingId}\n\nSampai jumpa kembali! 🙏`
-    };
-
-    const template = templates[booking.status] || templates['PENDING'];
-    const message = template(booking);
     const waNumber = CONFIG.WHATSAPP_ADMIN_NUMBER;
-    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    const message = `Halo *${booking.nama}*, booking Anda telah kami terima dengan ID: *${booking.bookingId}*
+
+📅 Tanggal: ${booking.tanggal}
+🕐 Jam: ${booking.jam}
+👥 Jumlah: ${booking.jumlah} orang
+💇 Layanan: ${booking.layanan}
+
+📌 Status: PENDING
+Mohon tunggu konfirmasi dari kami.`;
+
+    resWaBtn.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+
+    resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
-  // ========== MODAL: RESCHEDULE ==========
-  function openRescheduleModal(bookingId) {
-    actionTargetId = bookingId;
-    rsBookingId.textContent = bookingId;
-    rsTanggal.value = '';
-    rsJam.value = '';
-    const today = new Date();
-    rsTanggal.min = today.toISOString().split('T')[0];
-    rescheduleModal.classList.add('open');
-  }
+  // ========== RESET ==========
+  resNewBtn.addEventListener('click', function() {
+    form.reset();
+    selectedJam = null;
+    inputJam.value = '';
+    currentBooking = null;
 
-  rsCancelBtn.addEventListener('click', function() {
-    rescheduleModal.classList.remove('open');
-  });
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    inputTanggal.value = tomorrow.toISOString().split('T')[0];
 
-  rsSubmitBtn.addEventListener('click', function() {
-    const tanggalBaru = rsTanggal.value;
-    const jamBaru = rsJam.value;
-    
-    if (!tanggalBaru || !jamBaru) {
-      toast('Tanggal dan jam baru wajib diisi.', 'error');
-      return;
-    }
+    slotGrid.innerHTML = '<div class="loading-row">Pilih tanggal untuk melihat jam tersedia</div>';
+    formCard.style.display = 'block';
+    resultCard.style.display = 'none';
+    formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-    const bookings = getBookings();
-    const index = bookings.findIndex(b => b.bookingId === actionTargetId);
-    
-    if (index === -1) {
-      toast('Booking tidak ditemukan', 'error');
-      return;
-    }
-
-    bookings[index].tanggal = tanggalBaru;
-    bookings[index].jam = jamBaru;
-    bookings[index].status = 'RESCHEDULED';
-    bookings[index].updatedAt = new Date().toISOString();
-    
-    saveBookings(bookings);
-    rescheduleModal.classList.remove('open');
-    lastRenderHash = '';
-    toast('Booking berhasil direschedule!', 'success');
-    refreshDashboard();
-  });
-
-  // ========== MODAL: REASON ==========
-  function openReasonModal(bookingId, mode) {
-    actionTargetId = bookingId;
-    reasonMode = mode;
-    reasonTitle.textContent = mode === 'cancel' ? 'Alasan Pembatalan' : 'Alasan Penolakan';
-    rnBookingId.textContent = bookingId;
-    rnAlasan.value = '';
-    reasonModal.classList.add('open');
-  }
-
-  rnCancelBtn.addEventListener('click', function() {
-    reasonModal.classList.remove('open');
-  });
-
-  rnSubmitBtn.addEventListener('click', function() {
-    const alasan = rnAlasan.value.trim();
-    
-    if (!alasan) {
-      toast('Alasan wajib diisi.', 'error');
-      return;
-    }
-
-    const status = reasonMode === 'cancel' ? 'CANCELLED' : 'REJECTED';
-    updateStatus(actionTargetId, status, alasan);
-    reasonModal.classList.remove('open');
-  });
-
-  // ========== KEYBOARD SHORTCUTS ==========
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      if (rescheduleModal.classList.contains('open')) {
-        rescheduleModal.classList.remove('open');
-      }
-      if (reasonModal.classList.contains('open')) {
-        reasonModal.classList.remove('open');
-      }
+    if (inputTanggal.value && selectLayanan.value) {
+      loadSlots();
     }
   });
 
   // ========== INIT ==========
-  console.log('✅ Admin loaded successfully!');
-  console.log('🔑 Password: admin123');
-  console.log('📊 Storage key:', CONFIG.STORAGE_KEY);
-
-  // Auto show dashboard if already logged in (via session)
-  // For simplicity, start with login screen
+  (function init() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    inputTanggal.value = tomorrow.toISOString().split('T')[0];
+    inputTanggal.min = tomorrow.toISOString().split('T')[0];
+    
+    console.log('✅ Booking page loaded successfully!');
+    console.log('📊 Data disimpan di Local Storage dengan key:', CONFIG.STORAGE_KEY);
+    console.log('🔓 Tidak perlu login - semua orang bisa booking!');
+  })();
 
 })();
 </script>
