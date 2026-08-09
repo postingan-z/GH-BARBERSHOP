@@ -6,7 +6,375 @@
 <title>Booking Online</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
+<style>
+/* ========== CSS STYLES ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: #f3f4f6;
+  color: #1f2937;
+  min-height: 100vh;
+}
+
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px 16px;
+}
+
+/* TOPBAR */
+.topbar {
+  display: flex;
+  align-items: center;
+  background: #1f2937;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.brand span {
+  color: #f59e0b;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 6px;
+}
+
+.nav-links li a {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.nav-links li a:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+}
+
+.nav-links li a.active {
+  color: #fff;
+  background: rgba(255,255,255,0.15);
+}
+
+.conn-indicator {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+.conn-indicator.online {
+  color: #22c55e;
+}
+.conn-indicator.offline {
+  color: #ef4444;
+}
+
+/* CARD */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+.card h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.card .subtitle {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+/* FIELD */
+.field {
+  margin-bottom: 16px;
+}
+.field label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  color: #374151;
+}
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  background: #fff;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+.field textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* SLOT GRID */
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.slot-item {
+  padding: 10px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+
+.slot-item.available:hover {
+  border-color: #6b7280;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.slot-item.selected {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.slot-item.unavailable {
+  background: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.slot-time {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.slot-info {
+  display: block;
+  font-size: 0.7rem;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.slot-badge {
+  display: inline-block;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.6rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-top: 4px;
+}
+
+.loading-row {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 20px;
+  color: #6b7280;
+}
+.loading-row.error {
+  color: #ef4444;
+}
+
+/* BUTTON */
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+  width: 100%;
+}
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.btn-amber {
+  background: #f59e0b;
+  color: #fff;
+}
+.btn-amber:hover {
+  background: #d97706;
+}
+.btn-outline {
+  background: transparent;
+  color: #374151;
+  border: 2px solid #d1d5db;
+}
+.btn-outline:hover {
+  background: #f3f4f6;
+}
+
+/* DETAIL ROW */
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+.detail-row .label {
+  color: #6b7280;
+  font-weight: 500;
+}
+.detail-row .value {
+  font-weight: 700;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.badge-PENDING {
+  background: #fef3c7;
+  color: #d97706;
+}
+.badge-CONFIRMED {
+  background: #dbeafe;
+  color: #2563eb;
+}
+.badge-COMPLETED {
+  background: #d1fae5;
+  color: #059669;
+}
+.badge-CANCELLED {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+.badge-REJECTED {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.badge-RESCHEDULED {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+/* TOAST */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.toast {
+  padding: 14px 20px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 500;
+  font-size: 0.9rem;
+  min-width: 250px;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: slideIn 0.3s ease;
+}
+.toast-success { background: #22c55e; }
+.toast-error { background: #ef4444; }
+.toast-info { background: #3b82f6; }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* RESPONSIVE */
+@media (max-width: 640px) {
+  .topbar {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    gap: 8px;
+  }
+  .navbar {
+    order: 3;
+    width: 100%;
+    margin: 0;
+    justify-content: center;
+  }
+  .nav-links li a {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+  }
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+  .slot-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+  .card {
+    padding: 16px;
+  }
+  .toast {
+    min-width: 200px;
+    font-size: 0.8rem;
+    padding: 12px 16px;
+  }
+}
+</style>
 </head>
 <body>
 
@@ -51,7 +419,13 @@
       <div class="field">
         <label>Jenis Layanan</label>
         <select name="layanan" id="select-layanan" required>
-          <option value="">Memuat layanan...</option>
+          <option value="">Pilih Layanan</option>
+          <option value="Potong Rambut">Potong Rambut</option>
+          <option value="Creambath">Creambath</option>
+          <option value="Cat Rambut">Cat Rambut</option>
+          <option value="Smoothing">Smoothing</option>
+          <option value="Hair Treatment">Hair Treatment</option>
+          <option value="Full Package">Full Package</option>
         </select>
       </div>
 
@@ -91,8 +465,311 @@
 
 <div id="toast-container"></div>
 
-<script src="assets/js/config.js"></script>
-<script src="assets/js/api.js"></script>
-<script src="assets/js/booking.js"></script>
+<script>
+// ========================================
+// ALL JAVASCRIPT LOGIC
+// ========================================
+
+(function() {
+  'use strict';
+
+  // ========== CONFIGURATION ==========
+  const CONFIG = {
+    ADMIN_PASSWORD: 'admin123',
+    WHATSAPP_ADMIN_NUMBER: '6281234567890',
+    OPERATIONAL_HOURS: { start: '08:00', end: '21:00' },
+    SLOT_DURATION: 60,
+    MAX_CAPACITY: 10,
+    STORAGE_KEY: 'bookings_data'
+  };
+
+  // ========== DOM REFS ==========
+  const form = document.getElementById('booking-form');
+  const formCard = document.getElementById('form-card');
+  const resultCard = document.getElementById('result-card');
+  const submitBtn = document.getElementById('submit-btn');
+  const slotGrid = document.getElementById('slot-grid');
+  const inputJam = document.getElementById('input-jam');
+  const inputTanggal = document.getElementById('input-tanggal');
+  const selectLayanan = document.getElementById('select-layanan');
+  const connIndicator = document.getElementById('conn-indicator');
+
+  const resId = document.getElementById('res-id');
+  const resNama = document.getElementById('res-nama');
+  const resTanggal = document.getElementById('res-tanggal');
+  const resJam = document.getElementById('res-jam');
+  const resWaBtn = document.getElementById('res-wa-btn');
+  const resNewBtn = document.getElementById('res-new-btn');
+
+  let selectedJam = null;
+  let currentBooking = null;
+
+  // ========== LOCAL STORAGE ==========
+  function getBookings() {
+    try {
+      const data = localStorage.getItem(CONFIG.STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch { return []; }
+  }
+
+  function saveBookings(bookings) {
+    localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(bookings));
+  }
+
+  function generateId() {
+    return 'BK' + Date.now().toString(36).toUpperCase() + 
+           Math.random().toString(36).substring(2, 5).toUpperCase();
+  }
+
+  function generateTimeSlots() {
+    const slots = [];
+    const start = CONFIG.OPERATIONAL_HOURS.start;
+    const end = CONFIG.OPERATIONAL_HOURS.end;
+    const duration = CONFIG.SLOT_DURATION;
+    
+    let current = new Date(`2000-01-01 ${start}`);
+    const endTime = new Date(`2000-01-01 ${end}`);
+    
+    while (current < endTime) {
+      slots.push(current.toTimeString().slice(0, 5));
+      current.setMinutes(current.getMinutes() + duration);
+    }
+    return slots;
+  }
+
+  // ========== TOAST ==========
+  function toast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(100%)';
+      setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 300);
+    }, 3000);
+  }
+
+  // ========== CONNECTION STATUS ==========
+  function updateConnectionStatus(online) {
+    connIndicator.className = `conn-indicator ${online ? 'online' : 'offline'}`;
+    connIndicator.textContent = online ? '● LIVE' : '● OFFLINE';
+  }
+  updateConnectionStatus(true);
+
+  // ========== LOAD SLOTS ==========
+  function loadSlots() {
+    const tanggal = inputTanggal.value;
+    const layanan = selectLayanan.value;
+
+    if (!tanggal || !layanan) {
+      slotGrid.innerHTML = '<div class="loading-row">Pilih tanggal dan layanan untuk melihat jam tersedia</div>';
+      return;
+    }
+
+    slotGrid.innerHTML = '<div class="loading-row">Memuat jam tersedia...</div>';
+
+    // Simulasi loading
+    setTimeout(() => {
+      const bookings = getBookings();
+      const allSlots = generateTimeSlots();
+      
+      const existingBookings = bookings.filter(b => 
+        b.tanggal === tanggal && 
+        b.layanan === layanan &&
+        (b.status === 'PENDING' || b.status === 'CONFIRMED' || b.status === 'RESCHEDULED')
+      );
+
+      const availableSlots = allSlots.map(slot => {
+        const count = existingBookings.filter(b => b.jam === slot).length;
+        return {
+          time: slot,
+          available: count < CONFIG.MAX_CAPACITY,
+          booked: count,
+          max: CONFIG.MAX_CAPACITY
+        };
+      });
+
+      renderSlots(availableSlots);
+    }, 300);
+  }
+
+  function renderSlots(slots) {
+    if (!slots || slots.length === 0) {
+      slotGrid.innerHTML = '<div class="loading-row">Tidak ada jam tersedia</div>';
+      return;
+    }
+
+    let html = '';
+    let hasAvailable = false;
+
+    slots.forEach(slot => {
+      const isAvailable = slot.available !== false;
+      const isSelected = selectedJam === slot.time;
+      if (isAvailable) hasAvailable = true;
+
+      html += `
+        <div class="slot-item ${isAvailable ? 'available' : 'unavailable'} ${isSelected ? 'selected' : ''}"
+             data-time="${slot.time}"
+             data-available="${isAvailable}"
+             ${!isAvailable ? 'style="cursor:not-allowed;opacity:0.5;"' : ''}>
+          <span class="slot-time">${slot.time}</span>
+          ${slot.booked !== undefined ? `<span class="slot-info">${slot.booked}/${slot.max}</span>` : ''}
+          ${isAvailable ? '' : '<span class="slot-badge">Full</span>'}
+        </div>
+      `;
+    });
+
+    slotGrid.innerHTML = html;
+
+    if (!hasAvailable) {
+      slotGrid.innerHTML = '<div class="loading-row">Maaf, semua jam sudah penuh</div>';
+      return;
+    }
+
+    document.querySelectorAll('.slot-item.available').forEach(el => {
+      el.addEventListener('click', function() {
+        document.querySelectorAll('.slot-item.selected').forEach(e => e.classList.remove('selected'));
+        this.classList.add('selected');
+        selectedJam = this.dataset.time;
+        inputJam.value = selectedJam;
+      });
+    });
+
+    if (!selectedJam || !document.querySelector(`.slot-item[data-time="${selectedJam}"]`)) {
+      selectedJam = null;
+      inputJam.value = '';
+    }
+  }
+
+  // ========== EVENT HANDLERS ==========
+  inputTanggal.addEventListener('change', function() {
+    selectedJam = null;
+    inputJam.value = '';
+    loadSlots();
+  });
+
+  selectLayanan.addEventListener('change', function() {
+    selectedJam = null;
+    inputJam.value = '';
+    loadSlots();
+  });
+
+  // ========== SUBMIT ==========
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const nama = formData.get('nama').trim();
+    const whatsapp = formData.get('whatsapp').trim();
+    const tanggal = formData.get('tanggal');
+    const jumlah = parseInt(formData.get('jumlah'));
+    const layanan = formData.get('layanan');
+    const catatan = formData.get('catatan').trim() || '-';
+
+    if (!selectedJam) {
+      toast('Silakan pilih jam terlebih dahulu', 'error');
+      return;
+    }
+
+    if (!/^[0-9]{10,15}$/.test(whatsapp)) {
+      toast('Nomor WhatsApp tidak valid (min 10 digit)', 'error');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Memproses...';
+
+    setTimeout(() => {
+      try {
+        const bookings = getBookings();
+        const newBooking = {
+          bookingId: generateId(),
+          nama,
+          whatsapp,
+          tanggal,
+          jam: selectedJam,
+          jumlah,
+          layanan,
+          catatan,
+          status: 'PENDING',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+
+        bookings.push(newBooking);
+        saveBookings(bookings);
+
+        currentBooking = newBooking;
+        showResult(newBooking);
+        toast('Booking berhasil dibuat!', 'success');
+      } catch (error) {
+        toast('Terjadi kesalahan, silakan coba lagi', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Buat Booking';
+      }
+    }, 500);
+  });
+
+  // ========== SHOW RESULT ==========
+  function showResult(booking) {
+    formCard.style.display = 'none';
+    resultCard.style.display = 'block';
+
+    resId.textContent = booking.bookingId;
+    resNama.textContent = booking.nama;
+    resTanggal.textContent = booking.tanggal;
+    resJam.textContent = booking.jam;
+
+    const waNumber = CONFIG.WHATSAPP_ADMIN_NUMBER;
+    const message = `Halo *${booking.nama}*, booking Anda telah kami terima dengan ID: *${booking.bookingId}*
+
+📅 Tanggal: ${booking.tanggal}
+🕐 Jam: ${booking.jam}
+👥 Jumlah: ${booking.jumlah} orang
+💇 Layanan: ${booking.layanan}
+
+📌 Status: PENDING
+Mohon tunggu konfirmasi dari kami.`;
+
+    resWaBtn.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+
+    resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // ========== RESET ==========
+  resNewBtn.addEventListener('click', function() {
+    form.reset();
+    selectedJam = null;
+    inputJam.value = '';
+    currentBooking = null;
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    inputTanggal.value = tomorrow.toISOString().split('T')[0];
+
+    slotGrid.innerHTML = '<div class="loading-row">Pilih tanggal untuk melihat jam tersedia</div>';
+    formCard.style.display = 'block';
+    resultCard.style.display = 'none';
+    formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    if (inputTanggal.value && selectLayanan.value) {
+      loadSlots();
+    }
+  });
+
+  // ========== INIT ==========
+  (function init() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    inputTanggal.value = tomorrow.toISOString().split('T')[0];
+    inputTanggal.min = tomorrow.toISOString().split('T')[0];
+  })();
+
+})();
+</script>
+
 </body>
 </html>
