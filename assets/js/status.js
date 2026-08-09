@@ -1,284 +1,292 @@
 /**
- * STATUS.JS - Logika halaman status.html (cek status real-time)
- * Menggunakan Local Storage sebagai database
+ * ADMIN.JS - Real-time admin dashboard dengan Google Apps Script
  */
 (function() {
-    'use strict';
+  'use strict';
 
-    // ========== CONFIGURATION ==========
-    const CONFIG = {
-        STORAGE_KEY: 'bookings_data',
-        WHATSAPP_ADMIN_NUMBER: '6281234567890',
-        POLLING_INTERVAL_MS: 3000
-    };
+  let token = sessionStorage.getItem('admin_token') || null;
+  let pollHandle = null;
+  let currentBookings = [];
+  let lastRenderHash = '';
+  let actionTargetId = null;
+  let reasonMode = 'cancel';
 
-    // ========== LOCAL STORAGE HELPERS ==========
-    function getBookings() {
-        try {
-            const data = localStorage.getItem(CONFIG.STORAGE_KEY);
-            return data ? JSON.parse(data) : [];
-        } catch (e) {
-            return [];
-        }
+  const loginWrap = document.getElementById('login-wrap');
+  const dashboardWrap = document.getElementById('dashboard-wrap');
+  const loginForm = document.getElementById('login-form');
+  const loginBtn = document.getElementById('login-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+  const tbody = document.getElementById('booking-tbody');
+  const connIndicator = document.getElementById('conn-indicator');
+
+  // Modals
+  const rescheduleModal = document.getElementById('reschedule-modal');
+  const rsBookingId = document.getElementById('rs-booking-id');
+  const rsTanggal = document.getElementById('rs-tanggal');
+  const rsJam = document.getElementById('rs-jam');
+  const rsCancelBtn = document.getElementById('rs-cancel-btn');
+  const rsSubmitBtn = document.getElementById('rs-submit-btn');
+
+  const reasonModal = document.getElementById('reason-modal');
+  const reasonTitle = document.getElementById('reason-title');
+  const rnBookingId = document.getElementById('rn-booking-id');
+  const rnAlasan = document.getElementById('rn-alasan');
+  const rnCancelBtn = document.getElementById('rn-cancel-btn');
+  const rnSubmitBtn = document.getElementById('rn-submit-btn');
+
+  // ========== LOGIN ==========
+  loginForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const password = new FormData(e.target).get('password');
+
+    loginBtn.disabled = true;
+    loginBtn.textContent = '⏳ Memeriksa...';
+
+    try {
+      const res = await API.adminLogin(password);
+
+      if (!res.success) {
+        toast(res.message || 'Login gagal.', 'error');
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Masuk';
+        return;
+      }
+
+      token = res.token;
+      sessionStorage.setItem('admin_token', token);
+      toast('✅ Login berhasil!', 'success');
+      enterDashboard();
+
+    } catch (error) {
+      console.error('Login error:', error);
+      toast('Terjadi kesalahan, silakan coba lagi', 'error');
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Masuk';
     }
+  });
 
-    // ========== TOAST NOTIFICATION ==========
-    function toast(message, type = 'info') {
-        const container = document.getElementById('toast-container');
-        if (!container) return;
-        
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.textContent = message;
-        
-        container.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                if (container.contains(toast)) {
-                    container.removeChild(toast);
-                }
-            }, 300);
-        }, 3000);
+  // ========== LOGOUT ==========
+  logoutBtn.addEventListener('click', function() {
+    sessionStorage.removeItem('admin_token');
+    token = null;
+    if (pollHandle) { clearInterval(pollHandle); pollHandle = null; }
+    dashboardWrap.style.display = 'none';
+    loginWrap.style.display = 'flex';
+    toast('Logout berhasil', 'info');
+  });
+
+  // ========== ENTER DASHBOARD ==========
+  function enterDashboard() {
+    loginWrap.style.display = 'none';
+    dashboardWrap.style.display = 'block';
+    
+    refreshAll();
+    
+    // Real-time polling setiap 3 detik
+    if (pollHandle) clearInterval(pollHandle);
+    pollHandle = setInterval(refreshAll, CONFIG.POLLING_INTERVAL_MS || 3000);
+  }
+
+  // ========== REFRESH ALL ==========
+  async function refreshAll() {
+    try {
+      const [statsRes, bookingsRes] = await Promise.all([
+        API.getDashboard(token),
+        API.getBookings(token)
+      ]);
+
+      if (!statsRes.success || !bookingsRes.success) {
+        const msg = statsRes.message || bookingsRes.message || '';
+        if (msg.includes('Unauthorized') || msg.includes('token')) {
+          toast('Sesi admin berakhir, silakan login ulang.', 'error');
+          logoutBtn.click();
+        }
+        return;
+      }
+
+      renderStats(statsRes.stats);
+      renderTable(bookingsRes.bookings);
+
+    } catch (error) {
+      console.error('Refresh error:', error);
     }
+  }
 
-    // ========== WHATSAPP TEMPLATES ==========
-    const WA_TEMPLATES = {
-        'new': function(booking) {
-            return `Halo *${booking.nama}*, booking Anda telah kami terima dengan ID: *${booking.bookingId}*
-
-📅 Tanggal: ${booking.tanggal}
-🕐 Jam: ${booking.jam}
-👥 Jumlah: ${booking.jumlah} orang
-💇 Layanan: ${booking.layanan}
-
-📌 Status: ${booking.status}
-Mohon tunggu konfirmasi dari kami.`;
-        },
-        'PENDING': function(booking) {
-            return `Halo *${booking.nama}*, booking Anda dengan ID: *${booking.bookingId}* masih dalam status PENDING.
-
-📅 Tanggal: ${booking.tanggal}
-🕐 Jam: ${booking.jam}
-👥 Jumlah: ${booking.jumlah} orang
-💇 Layanan: ${booking.layanan}
-
-Mohon tunggu konfirmasi dari kami.`;
-        },
-        'CONFIRMED': function(booking) {
-            return `Halo *${booking.nama}*, booking Anda dengan ID: *${booking.bookingId}* telah dikonfirmasi! ✅
-
-📅 Tanggal: ${booking.tanggal}
-🕐 Jam: ${booking.jam}
-👥 Jumlah: ${booking.jumlah} orang
-💇 Layanan: ${booking.layanan}
-
-Silakan datang tepat waktu. Terima kasih!`;
-        },
-        'RESCHEDULED': function(booking) {
-            return `Halo *${booking.nama}*, booking Anda dengan ID: *${booking.bookingId}* telah dijadwalkan ulang. 🔄
-
-📅 Tanggal baru: ${booking.tanggal}
-🕐 Jam baru: ${booking.jam}
-👥 Jumlah: ${booking.jumlah} orang
-💇 Layanan: ${booking.layanan}
-
-Mohon konfirmasi kembali. Terima kasih!`;
-        },
-        'COMPLETED': function(booking) {
-            return `Halo *${booking.nama}*, booking Anda dengan ID: *${booking.bookingId}* telah selesai. ✅
-
-Terima kasih telah menggunakan layanan kami! 🙏`;
-        },
-        'CANCELLED': function(booking) {
-            return `Halo *${booking.nama}*, booking Anda dengan ID: *${booking.bookingId}* telah dibatalkan. ❌
-
-📌 Alasan: ${booking.alasan || '-'}
-
-Untuk informasi lebih lanjut, silakan hubungi kami.`;
-        },
-        'REJECTED': function(booking) {
-            return `Halo *${booking.nama}*, mohon maaf booking Anda dengan ID: *${booking.bookingId}* tidak dapat kami terima. ❌
-
-📌 Alasan: ${booking.alasan || '-'}
-
-Silakan coba tanggal/jam lain atau hubungi kami untuk informasi lebih lanjut.`;
-        }
-    };
-
-    // ========== DOM REFS ==========
-    const searchForm = document.getElementById('search-form');
-    const searchBtn = document.getElementById('search-btn');
-    const searchCard = document.getElementById('search-card');
-    const detailCard = document.getElementById('detail-card');
-    const backBtn = document.getElementById('d-back-btn');
-    const waBtn = document.getElementById('d-wa-btn');
-
-    // Detail elements
-    const dId = document.getElementById('d-id');
-    const dNama = document.getElementById('d-nama');
-    const dTanggal = document.getElementById('d-tanggal');
-    const dJam = document.getElementById('d-jam');
-    const dJumlah = document.getElementById('d-jumlah');
-    const dLayanan = document.getElementById('d-layanan');
-    const dCatatan = document.getElementById('d-catatan');
-    const dUpdated = document.getElementById('d-updated');
-    const dBadge = document.getElementById('detail-badge');
-
-    // ========== STATE ==========
-    let currentBookingId = null;
-    let currentWhatsapp = null;
-    let pollHandle = null;
-    let lastStatus = null;
-
-    // ========== SEARCH BOOKING ==========
-    searchForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-
-        const fd = new FormData(searchForm);
-        const bookingId = fd.get('bookingId').trim();
-        const whatsapp = fd.get('whatsapp').trim();
-
-        if (!bookingId) {
-            toast('Silakan masukkan Booking ID', 'error');
-            return;
-        }
-
-        if (!whatsapp) {
-            toast('Silakan masukkan nomor WhatsApp', 'error');
-            return;
-        }
-
-        // Validate WhatsApp number
-        if (!/^[0-9]{10,15}$/.test(whatsapp)) {
-            toast('Nomor WhatsApp tidak valid (min 10 digit angka)', 'error');
-            return;
-        }
-
-        searchBtn.disabled = true;
-        searchBtn.textContent = 'Mencari...';
-
-        // Simulasi pencarian
-        setTimeout(() => {
-            const result = findBooking(bookingId, whatsapp);
-            
-            searchBtn.disabled = false;
-            searchBtn.textContent = 'Cek Status';
-
-            if (!result) {
-                toast('Booking tidak ditemukan. Periksa kembali ID dan nomor WhatsApp Anda.', 'error');
-                return;
-            }
-
-            currentBookingId = bookingId;
-            currentWhatsapp = whatsapp;
-            lastStatus = result.status;
-
-            showDetail(result);
-            searchCard.style.display = 'none';
-            detailCard.style.display = 'block';
-
-            // Start polling for real-time updates
-            if (pollHandle) clearInterval(pollHandle);
-            pollHandle = setInterval(pollStatus, CONFIG.POLLING_INTERVAL_MS);
-
-            toast('Booking ditemukan!', 'success');
-        }, 500);
+  function renderStats(stats) {
+    ['total', 'PENDING', 'CONFIRMED', 'RESCHEDULED', 'CANCELLED', 'REJECTED', 'COMPLETED'].forEach(k => {
+      const el = document.getElementById('s-' + k);
+      if (el) el.textContent = stats[k] ?? 0;
     });
+  }
 
-    // ========== FIND BOOKING ==========
-    function findBooking(bookingId, whatsapp) {
-        const bookings = getBookings();
-        return bookings.find(b => 
-            b.bookingId === bookingId && 
-            b.whatsapp === whatsapp
-        ) || null;
+  function renderTable(bookings) {
+    const hash = JSON.stringify(bookings.map(b => [b.bookingId, b.status, b.updatedAt]));
+    if (hash === lastRenderHash) return;
+    lastRenderHash = hash;
+    currentBookings = bookings;
+
+    if (!bookings || bookings.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="10" class="loading-row">Belum ada booking.</td></tr>';
+      return;
     }
 
-    // ========== POLL STATUS ==========
-    function pollStatus() {
-        if (!currentBookingId || !currentWhatsapp) return;
+    const sorted = [...bookings].sort((a, b) => 
+      new Date(b.createdAt || b.updatedAt) - new Date(a.createdAt || a.updatedAt)
+    );
 
-        const result = findBooking(currentBookingId, currentWhatsapp);
-        if (!result) {
-            toast('Booking tidak ditemukan lagi', 'error');
-            clearInterval(pollHandle);
-            return;
-        }
+    tbody.innerHTML = sorted.map(function(b) {
+      let actions = '';
+      
+      if (b.status === 'PENDING') {
+        actions += `<button class="btn btn-green btn-sm" data-action="confirm" data-id="${b.bookingId}">✅ Confirm</button>`;
+      }
+      
+      if (!['COMPLETED', 'CANCELLED', 'REJECTED'].includes(b.status)) {
+        actions += `<button class="btn btn-blue btn-sm" data-action="reschedule" data-id="${b.bookingId}">🔄 Reschedule</button>`;
+      }
+      
+      if (!['CANCELLED', 'REJECTED', 'COMPLETED'].includes(b.status)) {
+        actions += `<button class="btn btn-outline btn-sm" data-action="cancel" data-id="${b.bookingId}">❌ Cancel</button>`;
+      }
+      
+      if (b.status === 'PENDING') {
+        actions += `<button class="btn btn-red btn-sm" data-action="reject" data-id="${b.bookingId}">⛔ Reject</button>`;
+      }
+      
+      if (!['COMPLETED', 'CANCELLED', 'REJECTED'].includes(b.status)) {
+        actions += `<button class="btn btn-outline btn-sm" data-action="complete" data-id="${b.bookingId}">✔️ Complete</button>`;
+      }
+      
+      actions += `<a class="btn btn-amber btn-sm" data-action="wa" data-id="${b.bookingId}" target="_blank" rel="noopener">💬 WA</a>`;
 
-        if (result.status !== lastStatus) {
-            toast(`Status booking Anda diperbarui: ${result.status}`, 'success');
-            lastStatus = result.status;
-            showDetail(result);
-        }
+      return `<tr>
+        <td><strong>${b.bookingId}</strong></td>
+        <td>${escapeHtml(b.nama)}</td>
+        <td>${escapeHtml(b.whatsapp)}</td>
+        <td>${b.tanggal}</td>
+        <td>${b.jam}</td>
+        <td>${b.jumlah}</td>
+        <td>${escapeHtml(b.layanan)}</td>
+        <td><span class="badge badge-${b.status}">${b.status}</span></td>
+        <td>${formatDate(b.updatedAt)}</td>
+        <td><div class="action-cell">${actions}</div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? '').replace(/[&<>"']/g, c => 
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]
+    );
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    try {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('id-ID') + ' ' + 
+             d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    } catch { return dateStr; }
+  }
+
+  // ========== ACTIONS ==========
+  tbody.addEventListener('click', async function(e) {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    const bookingId = btn.dataset.id;
+
+    if (action === 'confirm') {
+      if (!confirm('Konfirmasi booking ' + bookingId + '?')) return;
+      const res = await API.confirmBooking(bookingId, token);
+      handleActionResult(res, '✅ Booking dikonfirmasi.');
+    } else if (action === 'cancel') {
+      openReasonModal(bookingId, 'cancel');
+    } else if (action === 'reject') {
+      openReasonModal(bookingId, 'reject');
+    } else if (action === 'complete') {
+      if (!confirm('Tandai booking ' + bookingId + ' sebagai selesai?')) return;
+      const res = await API.completeBooking(bookingId, token);
+      handleActionResult(res, '✔️ Booking ditandai selesai.');
+    } else if (action === 'reschedule') {
+      openRescheduleModal(bookingId);
+    } else if (action === 'wa') {
+      e.preventDefault();
+      const booking = currentBookings.find(b => b.bookingId === bookingId);
+      if (!booking) return;
+      const tmpl = WA_TEMPLATES[booking.status] || WA_TEMPLATES['new'];
+      window.open(waLink(CONFIG.WHATSAPP_ADMIN_NUMBER, tmpl(booking)), '_blank');
     }
+  });
 
-    // ========== SHOW DETAIL ==========
-    function showDetail(booking) {
-        dId.textContent = booking.bookingId;
-        dNama.textContent = booking.nama;
-        dTanggal.textContent = booking.tanggal;
-        dJam.textContent = booking.jam;
-        dJumlah.textContent = booking.jumlah;
-        dLayanan.textContent = booking.layanan;
-        dCatatan.textContent = booking.catatan || '-';
-        dUpdated.textContent = booking.updatedAt ? formatDate(booking.updatedAt) : '-';
-
-        // Update badge
-        dBadge.textContent = booking.status;
-        dBadge.className = 'badge badge-' + booking.status;
-
-        // Update WhatsApp button
-        const template = WA_TEMPLATES[booking.status] || WA_TEMPLATES['new'];
-        const message = template(booking);
-        const waNumber = CONFIG.WHATSAPP_ADMIN_NUMBER;
-        waBtn.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+  function handleActionResult(res, successMsg) {
+    if (!res.success) {
+      toast(res.message || 'Aksi gagal.', 'error');
+      return;
     }
+    toast(successMsg, 'success');
+    lastRenderHash = '';
+    refreshAll();
+  }
 
-    // ========== FORMAT DATE ==========
-    function formatDate(dateStr) {
-        if (!dateStr) return '-';
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('id-ID') + ' ' + 
-               d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  // ========== MODALS ==========
+  function openRescheduleModal(bookingId) {
+    actionTargetId = bookingId;
+    rsBookingId.textContent = bookingId;
+    rsTanggal.value = '';
+    rsJam.value = '';
+    rescheduleModal.classList.add('open');
+  }
+
+  rsCancelBtn.addEventListener('click', () => rescheduleModal.classList.remove('open'));
+  rsSubmitBtn.addEventListener('click', async function() {
+    const tanggalBaru = rsTanggal.value;
+    const jamBaru = rsJam.value;
+    if (!tanggalBaru || !jamBaru) {
+      toast('Tanggal dan jam baru wajib diisi.', 'error');
+      return;
     }
+    const res = await API.rescheduleBooking(actionTargetId, tanggalBaru, jamBaru, token);
+    rescheduleModal.classList.remove('open');
+    handleActionResult(res, '🔄 Booking dijadwalkan ulang.');
+  });
 
-    // ========== BACK BUTTON ==========
-    backBtn.addEventListener('click', function() {
-        // Stop polling
-        if (pollHandle) {
-            clearInterval(pollHandle);
-            pollHandle = null;
-        }
-        
-        currentBookingId = null;
-        currentWhatsapp = null;
-        lastStatus = null;
+  function openReasonModal(bookingId, mode) {
+    actionTargetId = bookingId;
+    reasonMode = mode;
+    reasonTitle.textContent = mode === 'cancel' ? 'Alasan Pembatalan' : 'Alasan Penolakan';
+    rnBookingId.textContent = bookingId;
+    rnAlasan.value = '';
+    reasonModal.classList.add('open');
+  }
 
-        detailCard.style.display = 'none';
-        searchCard.style.display = 'block';
-        searchForm.reset();
-    });
+  rnCancelBtn.addEventListener('click', () => reasonModal.classList.remove('open'));
+  rnSubmitBtn.addEventListener('click', async function() {
+    const alasan = rnAlasan.value.trim();
+    if (!alasan) {
+      toast('Alasan wajib diisi.', 'error');
+      return;
+    }
+    const res = reasonMode === 'cancel'
+      ? await API.cancelBooking(actionTargetId, alasan, token)
+      : await API.rejectBooking(actionTargetId, alasan, token);
+    reasonModal.classList.remove('open');
+    handleActionResult(res, reasonMode === 'cancel' ? '❌ Booking dibatalkan.' : '⛔ Booking ditolak.');
+  });
 
-    // ========== WHATSAPP BUTTON ==========
-    waBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        if (this.href) {
-            window.open(this.href, '_blank');
-        }
-    });
+  // ========== CONNECTION INDICATOR ==========
+  document.addEventListener('connection-change', function(e) {
+    if (!connIndicator) return;
+    connIndicator.textContent = e.detail.online ? '● LIVE' : '⚠ OFFLINE';
+    connIndicator.className = `conn-indicator ${e.detail.online ? 'online' : 'offline'}`;
+  });
 
-    // ========== EXPOSE FUNCTIONS FOR TESTING ==========
-    window.status = {
-        findBooking,
-        pollStatus,
-        getBookings
-    };
+  // ========== INIT ==========
+  console.log('✅ Admin.js loaded - Real-time dashboard enabled');
+  console.log('🔑 Password: admin123');
+  console.log('📡 API:', CONFIG.API_URL);
 
-    // ========== INIT ==========
-    console.log('✅ Status.js loaded successfully!');
-    console.log('📊 Using Local Storage key:', CONFIG.STORAGE_KEY);
+  if (token) enterDashboard();
 
 })();
