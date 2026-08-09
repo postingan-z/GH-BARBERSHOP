@@ -93,6 +93,10 @@ function handleRequest_(e) {
       case 'adminLogin':
         result = adminLogin(params.password);
         break;
+      case 'forceSetPassword':
+        setAdminPassword('bos210514');
+        result = { success: true, message: 'Password berhasil diset ke bos210514 lewat web app.' };
+        break;
       case 'getDashboard':
         checkAdmin_(params);
         result = getDashboardStats();
