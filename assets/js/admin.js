@@ -392,13 +392,18 @@
         }
     });
 
-    // ========== INIT ==========
+    // ========== CHECK INITIAL LOGIN ==========
     function init() {
         console.log('✅ Admin.js loaded successfully!');
+        console.log('🔑 Default password: admin123');
+        console.log('📊 Using API:', CONFIG.API_URL);
         
         // Auto login if token exists
         if (token) {
+            console.log('🔐 Auto login with existing token');
             enterDashboard();
+        } else {
+            console.log('🔓 Please login to access dashboard');
         }
     }
 
