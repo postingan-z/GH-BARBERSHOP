@@ -1,140 +1,210 @@
-/**
- * BOOKING.JS - logika halaman index.html (form booking customer)
- */
-(function () {
-  const form = document.getElementById('booking-form');
-  const tanggalInput = document.getElementById('input-tanggal');
-  const jamHidden = document.getElementById('input-jam');
-  const slotGrid = document.getElementById('slot-grid');
-  const layananSelect = document.getElementById('select-layanan');
-  const submitBtn = document.getElementById('submit-btn');
+/* ========== SLOT GRID ========== */
+.slot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+}
 
-  let availabilityPollHandle = null;
-  let selectedSlot = null;
+.slot-item {
+    padding: 10px 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fff;
+    position: relative;
+}
 
-  // set tanggal minimum = hari ini
-  const today = new Date().toISOString().split('T')[0];
-  tanggalInput.min = today;
-  tanggalInput.value = today;
+.slot-item.available {
+    border-color: #d1d5db;
+    background: #fff;
+}
 
-  // ---------- load layanan ----------
-  async function loadServices() {
-    const res = await API.getServices();
-    if (res.success) {
-      layananSelect.innerHTML = res.services
-        .map(s => `<option value="${s.nama}">${s.nama}</option>`)
-        .join('');
-    } else {
-      layananSelect.innerHTML = '<option value="">Gagal memuat layanan</option>';
+.slot-item.available:hover {
+    border-color: #6b7280;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.slot-item.selected {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.slot-item.unavailable {
+    background: #f3f4f6;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.slot-time {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #1f2937;
+}
+
+.slot-info {
+    display: block;
+    font-size: 0.7rem;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.slot-badge {
+    display: inline-block;
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.6rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-top: 4px;
+}
+
+.loading-row {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 20px;
+    color: #6b7280;
+}
+
+.loading-row.error {
+    color: #ef4444;
+}
+
+/* ========== TOAST ========== */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    padding: 14px 20px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.9rem;
+    min-width: 250px;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+.toast-success {
+    background: #22c55e;
+}
+
+.toast-error {
+    background: #ef4444;
+}
+
+.toast-info {
+    background: #3b82f6;
+}
+
+.toast-warning {
+    background: #f59e0b;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
     }
-  }
-
-  // ---------- render slot availability ----------
-  function renderSlots(availability) {
-    if (!availability || !availability.length) {
-      slotGrid.innerHTML = '<div class="loading-row">Tidak ada slot tersedia.</div>';
-      return;
+    to {
+        transform: translateX(0);
+        opacity: 1;
     }
-    slotGrid.innerHTML = availability.map(function (a) {
-      const cls = ['slot'];
-      if (a.penuh) cls.push('full');
-      if (selectedSlot === a.jam && !a.penuh) cls.push('selected');
-      return `<div class="${cls.join(' ')}" data-jam="${a.jam}" data-penuh="${a.penuh}">
-                ${a.jam}<small>${a.penuh ? 'PENUH' : 'sisa ' + a.sisa}</small>
-              </div>`;
-    }).join('');
-  }
+}
 
-  async function refreshAvailability() {
-    if (!tanggalInput.value) return;
-    const res = await API.getAvailability(tanggalInput.value);
-    if (res.success) {
-      // jika slot yang sedang dipilih ternyata sudah penuh (diambil orang lain), batalkan pilihan
-      const chosen = res.availability.find(a => a.jam === selectedSlot);
-      if (chosen && chosen.penuh) {
-        selectedSlot = null;
-        jamHidden.value = '';
-        toast('Slot yang Anda pilih baru saja penuh, silakan pilih jam lain.', 'error');
-      }
-      renderSlots(res.availability);
+/* ========== NAVBAR STYLES ========== */
+.navbar {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 20px;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 8px;
+}
+
+.nav-links li a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+}
+
+.nav-links li a:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.1);
+}
+
+.nav-links li a.active {
+    color: #fff;
+    background: rgba(255,255,255,0.15);
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 640px) {
+    .topbar {
+        flex-wrap: wrap;
+        padding: 10px 16px;
+        gap: 8px;
     }
-  }
-
-  function startAvailabilityPolling() {
-    if (availabilityPollHandle) clearInterval(availabilityPollHandle);
-    availabilityPollHandle = startPolling(refreshAvailability, CONFIG.POLLING_INTERVAL_MS);
-  }
-
-  tanggalInput.addEventListener('change', function () {
-    selectedSlot = null;
-    jamHidden.value = '';
-    startAvailabilityPolling();
-  });
-
-  slotGrid.addEventListener('click', function (e) {
-    const el = e.target.closest('.slot');
-    if (!el) return;
-    if (el.dataset.penuh === 'true') return;
-    selectedSlot = el.dataset.jam;
-    jamHidden.value = selectedSlot;
-    slotGrid.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
-    el.classList.add('selected');
-  });
-
-  // ---------- submit booking ----------
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    if (!jamHidden.value) {
-      toast('Silakan pilih jam terlebih dahulu.', 'error');
-      return;
+    
+    .navbar {
+        order: 3;
+        width: 100%;
+        margin: 0;
+        justify-content: center;
     }
-
-    const fd = new FormData(form);
-    const payload = Object.fromEntries(fd.entries());
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Memproses...';
-
-    const res = await API.createBooking(payload);
-
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Buat Booking';
-
-    if (!res.success) {
-      toast(res.message || 'Booking gagal.', 'error');
-      refreshAvailability(); // sinkronkan ulang slot jika ternyata penuh
-      return;
+    
+    .nav-links {
+        gap: 4px;
+    }
+    
+    .nav-links li a {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+    }
+    
+    .conn-indicator {
+        margin-left: auto;
+        font-size: 0.7rem;
     }
 
-    toast('Booking berhasil dibuat!', 'success');
-    showResult(res.booking);
-  });
+    .slot-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    }
 
-  function showResult(booking) {
-    document.getElementById('form-card').style.display = 'none';
-    document.getElementById('result-card').style.display = 'block';
-    document.getElementById('res-id').textContent = booking.bookingId;
-    document.getElementById('res-nama').textContent = booking.nama;
-    document.getElementById('res-tanggal').textContent = booking.tanggal;
-    document.getElementById('res-jam').textContent = booking.jam;
+    .slot-item {
+        padding: 8px 6px;
+        font-size: 0.8rem;
+    }
 
-    const waBtn = document.getElementById('res-wa-btn');
-    waBtn.href = waLink(CONFIG.WHATSAPP_ADMIN_NUMBER, WA_TEMPLATES.new(booking));
-
-    if (availabilityPollHandle) clearInterval(availabilityPollHandle);
-  }
-
-  document.getElementById('res-new-btn').addEventListener('click', function () {
-    document.getElementById('result-card').style.display = 'none';
-    document.getElementById('form-card').style.display = 'block';
-    form.reset();
-    tanggalInput.value = today;
-    selectedSlot = null;
-    jamHidden.value = '';
-    startAvailabilityPolling();
-  });
-
-  // ---------- init ----------
-  loadServices();
-  startAvailabilityPolling();
-})();
+    .toast {
+        min-width: 200px;
+        max-width: 300px;
+        font-size: 0.8rem;
+        padding: 12px 16px;
+    }
+}
