@@ -9,13 +9,11 @@
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-
 <div class="page">
   <div class="topbar">
     <div class="brand"><a href="index.html" style="text-decoration:none;color:inherit;">Booking<span>.</span></a></div>
     <div id="conn-indicator" class="conn-indicator online">● LIVE</div>
   </div>
-
   <div class="card" id="search-card">
     <h2>Cek Status Booking</h2>
     <p class="subtitle">Masukkan Booking ID dan Nomor WhatsApp yang Anda gunakan saat booking.</p>
@@ -31,30 +29,19 @@
       <button type="submit" class="btn btn-primary" id="search-btn">Cek Status</button>
     </form>
   </div>
-
   <div class="card" id="detail-card" style="display:none;">
     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
       <h2 style="margin:0;">Detail Booking</h2>
       <span id="detail-badge" class="badge badge-PENDING">PENDING</span>
     </div>
-    <div class="detail-row"><span class="label">Booking ID</span><span class="value" id="d-id">-</span></div>
     <div class="detail-row"><span class="label">Nama</span><span class="value" id="d-nama">-</span></div>
-    <div class="detail-row"><span class="label">Tanggal</span><span class="value" id="d-tanggal">-</span></div>
     <div class="detail-row"><span class="label">Jam</span><span class="value" id="d-jam">-</span></div>
-    <div class="detail-row"><span class="label">Jumlah</span><span class="value" id="d-jumlah">-</span></div>
-    <div class="detail-row"><span class="label">Layanan</span><span class="value" id="d-layanan">-</span></div>
-    <div class="detail-row"><span class="label">Catatan</span><span class="value" id="d-catatan">-</span></div>
-    <div class="detail-row"><span class="label">Terakhir Diperbarui</span><span class="value" id="d-updated">-</span></div>
-
     <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
-      <a class="btn btn-amber" id="d-wa-btn" target="_blank" rel="noopener">Kirim WhatsApp</a>
       <button class="btn btn-outline" id="d-back-btn" type="button">Cek Booking Lain</button>
     </div>
   </div>
 </div>
-
 <div id="toast-container"></div>
-
 <script src="assets/js/config.js"></script>
 <script src="assets/js/api.js"></script>
 <script src="assets/js/status.js"></script>
